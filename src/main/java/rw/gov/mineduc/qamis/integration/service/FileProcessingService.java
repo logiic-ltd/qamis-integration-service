@@ -39,24 +39,44 @@ public class FileProcessingService {
                 String[] row = rows.get(i);
                 School school = new School();
 
-                school.setSchoolCode(Integer.parseInt(row[0]));
-                school.setSchoolName(row[1]);
-                school.setProvince(row[2]);
-                school.setDistrict(row[3]);
-                school.setSector(row[4]);
-                school.setCell(row[5]);
-                school.setVillage(row[6]);
-                school.setSchoolStatus(row[7]);
-                school.setSchoolOwner(row[8]);
-                school.setLatitude(Double.parseDouble(row[9]));
-                school.setLongitude(Double.parseDouble(row[10]));
-                school.setDay(row[11].isEmpty() ? null : row[11]);
-                school.setBoarding(row[12].isEmpty() ? null : row[12]);
+                school.setSchoolCode(parseIntOrNull(row[0]));
+                school.setSchoolName(parseStringOrNull(row[1]));
+                school.setProvince(parseStringOrNull(row[2]));
+                school.setDistrict(parseStringOrNull(row[3]));
+                school.setSector(parseStringOrNull(row[4]));
+                school.setCell(parseStringOrNull(row[5]));
+                school.setVillage(parseStringOrNull(row[6]));
+                school.setSchoolStatus(parseStringOrNull(row[7]));
+                school.setSchoolOwner(parseStringOrNull(row[8]));
+                school.setLatitude(parseDoubleOrNull(row[9]));
+                school.setLongitude(parseDoubleOrNull(row[10]));
+                school.setDay(parseStringOrNull(row[11]));
+                school.setBoarding(parseStringOrNull(row[12]));
 
                 schools.add(school);
             }
         }
 
         return schoolRepository.saveAll(schools);
+    }
+
+    private Integer parseIntOrNull(String value) {
+        try {
+            return value != null && !value.isEmpty() ? Integer.parseInt(value) : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private Double parseDoubleOrNull(String value) {
+        try {
+            return value != null && !value.isEmpty() ? Double.parseDouble(value) : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private String parseStringOrNull(String value) {
+        return value != null && !value.isEmpty() ? value : null;
     }
 }
