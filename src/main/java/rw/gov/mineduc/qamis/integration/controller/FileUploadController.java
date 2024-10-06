@@ -25,7 +25,7 @@ public class FileUploadController {
     public ResponseEntity<?> uploadSchoolFile(@RequestParam("file") MultipartFile file) {
         try {
             List<School> processedSchools = fileProcessingService.processSchoolFile(file);
-            return ResponseEntity.ok().body("Processed " + processedSchools.size() + " schools");
+            return ResponseEntity.ok().body("Successfully processed and saved " + processedSchools.size() + " schools to the database.");
         } catch (IOException | CsvException e) {
             return ResponseEntity.badRequest().body("Error processing file: " + e.getMessage());
         }
