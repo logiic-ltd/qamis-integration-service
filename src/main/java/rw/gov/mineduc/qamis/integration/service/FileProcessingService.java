@@ -37,9 +37,15 @@ public class FileProcessingService {
             // Skip the header row
             for (int i = 1; i < rows.size(); i++) {
                 String[] row = rows.get(i);
-                School school = new School();
+                Integer schoolCode = parseIntOrNull(row[0]);
+                
+                if (schoolCode == null) {
+                    continue; // Skip rows with invalid school codes
+                }
 
-                school.setSchoolCode(parseIntOrNull(row[0]));
+                School school = schoolRepository.findById(schoolCode).orElse(new School());
+
+                school.setSchoolCode(schoolCode);
                 school.setSchoolName(parseStringOrNull(row[1]));
                 school.setProvince(parseStringOrNull(row[2]));
                 school.setDistrict(parseStringOrNull(row[3]));
