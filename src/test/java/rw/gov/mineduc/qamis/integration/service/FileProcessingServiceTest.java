@@ -47,9 +47,9 @@ public class FileProcessingServiceTest {
         assertNotNull(firstSchool.getVillage());
         assertNotNull(firstSchool.getSchoolStatus());
         assertNotNull(firstSchool.getSchoolOwner());
-        assertNotNull(firstSchool.getSchoolType());
         assertNotNull(firstSchool.getLatitude());
         assertNotNull(firstSchool.getLongitude());
+        assertNotNull(firstSchool.getSchoolType());
 
         // Verify that all schools have been processed
         for (School school : processedSchools) {

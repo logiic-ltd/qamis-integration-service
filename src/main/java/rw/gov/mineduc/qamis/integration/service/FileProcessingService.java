@@ -58,9 +58,9 @@ public class FileProcessingService {
                 school.setVillage(currentRow.getCell(6).getStringCellValue());
                 school.setSchoolStatus(School.SchoolStatus.valueOf(currentRow.getCell(7).getStringCellValue().toUpperCase()));
                 school.setSchoolOwner(School.SchoolOwner.valueOf(currentRow.getCell(8).getStringCellValue().toUpperCase()));
-                school.setSchoolType(School.SchoolType.valueOf(currentRow.getCell(9).getStringCellValue().toUpperCase()));
-                school.setLatitude(currentRow.getCell(10).getNumericCellValue());
-                school.setLongitude(currentRow.getCell(11).getNumericCellValue());
+                school.setLatitude(currentRow.getCell(9).getNumericCellValue());
+                school.setLongitude(currentRow.getCell(10).getNumericCellValue());
+                school.setSchoolType(School.SchoolType.valueOf(currentRow.getCell(11).getStringCellValue().toUpperCase()));
 
                 schools.add(school);
             }
