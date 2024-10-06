@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import rw.gov.mineduc.qamis.integration.model.School;
 import rw.gov.mineduc.qamis.integration.repository.SchoolRepository;
 
+import com.opencsv.exceptions.CsvException;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,8 +28,8 @@ class FileProcessingServiceTest {
     private List<School> processedSchools;
 
     @BeforeEach
-    void setUp() throws IOException {
-        String filePath = "src/test/resources/sample_schools.xlsx";
+    void setUp() throws IOException, CsvException {
+        String filePath = "src/test/resources/sample_schools.csv";
         when(schoolRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
         processedSchools = fileProcessingService.processSchoolFileForTesting(filePath);
     }

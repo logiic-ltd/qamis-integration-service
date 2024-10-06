@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import rw.gov.mineduc.qamis.integration.model.School;
 import rw.gov.mineduc.qamis.integration.service.FileProcessingService;
 
+import com.opencsv.exceptions.CsvException;
 import java.io.IOException;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class FileUploadController {
         try {
             List<School> processedSchools = fileProcessingService.processSchoolFile(file);
             return ResponseEntity.ok().body("Processed " + processedSchools.size() + " schools");
-        } catch (IOException e) {
+        } catch (IOException | CsvException e) {
             return ResponseEntity.badRequest().body("Error processing file: " + e.getMessage());
         }
     }
