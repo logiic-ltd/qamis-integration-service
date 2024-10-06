@@ -11,6 +11,7 @@ import rw.gov.mineduc.qamis.integration.repository.SchoolRepository;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -31,7 +32,31 @@ class FileProcessingServiceTest {
 
     @Test
     void testProcessSchoolFile() throws IOException, CsvException {
-        // Existing test code...
+        String testFilePath = "src/test/resources/sample_schools.csv";
+        when(schoolRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<School> processedSchools = fileProcessingService.processSchoolFileForTesting(testFilePath);
+
+        assertNotNull(processedSchools);
+        assertFalse(processedSchools.isEmpty());
+        assertEquals(20, processedSchools.size());
+
+        // Verify the content of the first school
+        School firstSchool = processedSchools.get(0);
+        assertAllPropertiesNotNull(firstSchool);
+        assertEquals(110101, firstSchool.getSchoolCode());
+        assertEquals("CYAPEPE PRIMARY SCHOOL", firstSchool.getSchoolName());
+        assertEquals("Kigali City", firstSchool.getProvince());
+        assertEquals("Nyarugenge", firstSchool.getDistrict());
+        assertEquals("Gitega", firstSchool.getSector());
+        assertEquals("Akabahizi", firstSchool.getCell());
+        assertEquals("Iterambere", firstSchool.getVillage());
+        assertEquals("PRIVATE", firstSchool.getSchoolStatus());
+        assertEquals("PARENTS", firstSchool.getSchoolOwner());
+        assertEquals(-1.94486, firstSchool.getLatitude());
+        assertEquals(30.05216, firstSchool.getLongitude());
+        assertEquals("DAY", firstSchool.getDay());
+        assertNull(firstSchool.getBoarding());
     }
 
     @Test
@@ -60,34 +85,6 @@ class FileProcessingServiceTest {
         assertNotEquals("EXISTING SCHOOL", updatedSchool.getSchoolName());
 
         verify(schoolRepository, times(1)).findById(110101);
-    }
-
-    private void assertAllPropertiesNotNull(School school) {
-        String testFilePath = "src/test/resources/sample_schools.csv";
-        when(schoolRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
-
-        List<School> processedSchools = fileProcessingService.processSchoolFileForTesting(testFilePath);
-
-        assertNotNull(processedSchools);
-        assertFalse(processedSchools.isEmpty());
-        assertEquals(20, processedSchools.size());
-
-        // Verify the content of the first school
-        School firstSchool = processedSchools.get(0);
-        assertAllPropertiesNotNull(firstSchool);
-        assertEquals(110101, firstSchool.getSchoolCode());
-        assertEquals("CYAPEPE PRIMARY SCHOOL", firstSchool.getSchoolName());
-        assertEquals("Kigali City", firstSchool.getProvince());
-        assertEquals("Nyarugenge", firstSchool.getDistrict());
-        assertEquals("Gitega", firstSchool.getSector());
-        assertEquals("Akabahizi", firstSchool.getCell());
-        assertEquals("Iterambere", firstSchool.getVillage());
-        assertEquals("PRIVATE", firstSchool.getSchoolStatus());
-        assertEquals("PARENTS", firstSchool.getSchoolOwner());
-        assertEquals(-1.94486, firstSchool.getLatitude());
-        assertEquals(30.05216, firstSchool.getLongitude());
-        assertEquals("DAY", firstSchool.getDay());
-        assertTrue(firstSchool.getBoarding() == null || firstSchool.getBoarding().equals("NULL"));
     }
 
     private void assertAllPropertiesNotNull(School school) {
