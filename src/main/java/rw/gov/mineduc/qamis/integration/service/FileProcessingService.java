@@ -56,11 +56,12 @@ public class FileProcessingService {
                 school.setSector(currentRow.getCell(4).getStringCellValue());
                 school.setCell(currentRow.getCell(5).getStringCellValue());
                 school.setVillage(currentRow.getCell(6).getStringCellValue());
-                school.setSchoolStatus(School.SchoolStatus.valueOf(currentRow.getCell(7).getStringCellValue().toUpperCase()));
-                school.setSchoolOwner(School.SchoolOwner.valueOf(currentRow.getCell(8).getStringCellValue().toUpperCase()));
+                school.setSchoolStatus(currentRow.getCell(7).getStringCellValue());
+                school.setSchoolOwner(currentRow.getCell(8).getStringCellValue());
                 school.setLatitude(currentRow.getCell(9).getNumericCellValue());
                 school.setLongitude(currentRow.getCell(10).getNumericCellValue());
-                school.setSchoolType(School.SchoolType.valueOf(currentRow.getCell(11).getStringCellValue().toUpperCase()));
+                school.setDay(getCellValueAsString(currentRow.getCell(11)));
+                school.setBoarding(getCellValueAsString(currentRow.getCell(12)));
 
                 schools.add(school);
             }
@@ -69,3 +70,20 @@ public class FileProcessingService {
         return schoolRepository.saveAll(schools);
     }
 }
+    private String getCellValueAsString(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return String.valueOf(cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                return cell.getCellFormula();
+            default:
+                return null;
+        }
+    }

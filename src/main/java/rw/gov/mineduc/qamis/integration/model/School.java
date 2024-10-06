@@ -2,8 +2,6 @@ package rw.gov.mineduc.qamis.integration.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 
 @Entity
@@ -30,20 +28,20 @@ public class School {
     @Column(nullable = false)
     private String village;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SchoolStatus schoolStatus;
+    private String schoolStatus;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SchoolOwner schoolOwner;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private SchoolType schoolType;
+    private String schoolOwner;
 
     private Double latitude;
     private Double longitude;
+
+    @Column(nullable = true)
+    private String day;
+
+    @Column(nullable = true)
+    private String boarding;
 
     // Getters and Setters
     public Integer getSchoolCode() {
@@ -102,28 +100,20 @@ public class School {
         this.village = village;
     }
 
-    public SchoolStatus getSchoolStatus() {
+    public String getSchoolStatus() {
         return schoolStatus;
     }
 
-    public void setSchoolStatus(SchoolStatus schoolStatus) {
+    public void setSchoolStatus(String schoolStatus) {
         this.schoolStatus = schoolStatus;
     }
 
-    public SchoolOwner getSchoolOwner() {
+    public String getSchoolOwner() {
         return schoolOwner;
     }
 
-    public void setSchoolOwner(SchoolOwner schoolOwner) {
+    public void setSchoolOwner(String schoolOwner) {
         this.schoolOwner = schoolOwner;
-    }
-
-    public SchoolType getSchoolType() {
-        return schoolType;
-    }
-
-    public void setSchoolType(SchoolType schoolType) {
-        this.schoolType = schoolType;
     }
 
     public Double getLatitude() {
@@ -142,16 +132,19 @@ public class School {
         this.longitude = longitude;
     }
 
-    // Enums for SchoolStatus, SchoolOwner, and SchoolType
-    public enum SchoolStatus {
-        PUBLIC, PRIVATE
+    public String getDay() {
+        return day;
     }
 
-    public enum SchoolOwner {
-        GOVERNMENT, PARENTS, TEACHERS, OTHERS
+    public void setDay(String day) {
+        this.day = day;
     }
 
-    public enum SchoolType {
-        DAY, BOARDING, OTHER
+    public String getBoarding() {
+        return boarding;
+    }
+
+    public void setBoarding(String boarding) {
+        this.boarding = boarding;
     }
 }

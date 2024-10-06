@@ -49,12 +49,30 @@ public class FileProcessingServiceTest {
         assertNotNull(firstSchool.getSchoolOwner());
         assertNotNull(firstSchool.getLatitude());
         assertNotNull(firstSchool.getLongitude());
-        assertNotNull(firstSchool.getSchoolType());
+        assertNotNull(firstSchool.getDay());
+        assertNotNull(firstSchool.getBoarding());
 
         // Verify that all schools have been processed
         for (School school : processedSchools) {
             assertNotNull(school.getSchoolCode());
             assertNotNull(school.getSchoolName());
+            // Add more assertions as needed
         }
+
+        // Verify some specific values
+        assertEquals("PRIVATE", processedSchools.get(0).getSchoolStatus());
+        assertEquals("PARENTS", processedSchools.get(0).getSchoolOwner());
+        assertEquals("DAY", processedSchools.get(0).getDay());
+        assertNull(processedSchools.get(0).getBoarding());
+
+        assertEquals("PUBLIC", processedSchools.get(1).getSchoolStatus());
+        assertEquals("GoR", processedSchools.get(1).getSchoolOwner());
+        assertEquals("DAY", processedSchools.get(1).getDay());
+        assertEquals("BOARDING", processedSchools.get(1).getBoarding());
+
+        assertEquals("PRIVATE", processedSchools.get(2).getSchoolStatus());
+        assertEquals("OTHERS", processedSchools.get(2).getSchoolOwner());
+        assertNull(processedSchools.get(2).getDay());
+        assertEquals("BOARDING", processedSchools.get(2).getBoarding());
     }
 }
