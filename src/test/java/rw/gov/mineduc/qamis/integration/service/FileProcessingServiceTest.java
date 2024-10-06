@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 class FileProcessingServiceTest {
 
@@ -31,6 +31,38 @@ class FileProcessingServiceTest {
 
     @Test
     void testProcessSchoolFile() throws IOException, CsvException {
+        // Existing test code...
+    }
+
+    @Test
+    void testProcessSchoolFileWithExistingSchool() throws IOException, CsvException {
+        String testFilePath = "src/test/resources/sample_schools.csv";
+        School existingSchool = new School();
+        existingSchool.setSchoolCode(110101);
+        existingSchool.setSchoolName("EXISTING SCHOOL");
+
+        when(schoolRepository.findById(110101)).thenReturn(Optional.of(existingSchool));
+        when(schoolRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<School> processedSchools = fileProcessingService.processSchoolFileForTesting(testFilePath);
+
+        assertNotNull(processedSchools);
+        assertFalse(processedSchools.isEmpty());
+
+        School updatedSchool = processedSchools.stream()
+                .filter(s -> s.getSchoolCode().equals(110101))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(updatedSchool);
+        assertEquals(110101, updatedSchool.getSchoolCode());
+        assertEquals("CYAPEPE PRIMARY SCHOOL", updatedSchool.getSchoolName());
+        assertNotEquals("EXISTING SCHOOL", updatedSchool.getSchoolName());
+
+        verify(schoolRepository, times(1)).findById(110101);
+    }
+
+    private void assertAllPropertiesNotNull(School school) {
         String testFilePath = "src/test/resources/sample_schools.csv";
         when(schoolRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
 
