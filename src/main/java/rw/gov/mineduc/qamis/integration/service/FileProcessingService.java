@@ -43,23 +43,28 @@ public class FileProcessingService {
                     continue; // Skip rows with invalid school codes
                 }
 
-                School school = schoolRepository.findById(schoolCode).orElse(new School());
+                try {
+                    School school = schoolRepository.findById(schoolCode).orElse(new School());
 
-                school.setSchoolCode(schoolCode);
-                school.setSchoolName(parseStringOrNull(row[1]));
-                school.setProvince(parseStringOrNull(row[2]));
-                school.setDistrict(parseStringOrNull(row[3]));
-                school.setSector(parseStringOrNull(row[4]));
-                school.setCell(parseStringOrNull(row[5]));
-                school.setVillage(parseStringOrNull(row[6]));
-                school.setSchoolStatus(parseStringOrNull(row[7]));
-                school.setSchoolOwner(parseStringOrNull(row[8]));
-                school.setLatitude(parseDoubleOrNull(row[9]));
-                school.setLongitude(parseDoubleOrNull(row[10]));
-                school.setDay(parseStringOrNull(row[11]));
-                school.setBoarding(parseStringOrNull(row[12]));
+                    school.setSchoolCode(schoolCode);
+                    school.setSchoolName(parseStringOrNull(row[1]));
+                    school.setProvince(parseStringOrNull(row[2]));
+                    school.setDistrict(parseStringOrNull(row[3]));
+                    school.setSector(parseStringOrNull(row[4]));
+                    school.setCell(parseStringOrNull(row[5]));
+                    school.setVillage(parseStringOrNull(row[6]));
+                    school.setSchoolStatus(parseStringOrNull(row[7]));
+                    school.setSchoolOwner(parseStringOrNull(row[8]));
+                    school.setLatitude(parseDoubleOrNull(row[9]));
+                    school.setLongitude(parseDoubleOrNull(row[10]));
+                    school.setDay(parseStringOrNull(row[11]));
+                    school.setBoarding(parseStringOrNull(row[12]));
 
-                schools.add(school);
+                    schools.add(school);
+                } catch (Exception e) {
+                    // Log the error and continue with the next row
+                    System.err.println("Error processing row " + i + ": " + e.getMessage());
+                }
             }
         }
 
@@ -83,6 +88,6 @@ public class FileProcessingService {
     }
 
     private String parseStringOrNull(String value) {
-        return (value != null && !value.isEmpty() && !value.equalsIgnoreCase("NULL")) ? value : null;
+        return (value != null && !value.isEmpty() && !value.equalsIgnoreCase("NULL")) ? value : "";
     }
 }

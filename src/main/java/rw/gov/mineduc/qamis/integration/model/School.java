@@ -22,16 +22,16 @@ public class School {
     @Column(nullable = false)
     private String sector;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String cell;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String village;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String schoolStatus;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String schoolOwner;
 
     private Double latitude;
