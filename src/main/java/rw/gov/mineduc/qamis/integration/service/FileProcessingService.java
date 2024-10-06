@@ -60,8 +60,8 @@ public class FileProcessingService {
                 school.setSchoolOwner(currentRow.getCell(8).getStringCellValue());
                 school.setLatitude(currentRow.getCell(9).getNumericCellValue());
                 school.setLongitude(currentRow.getCell(10).getNumericCellValue());
-                school.setDay(getCellValueAsString(currentRow.getCell(11)));
-                school.setBoarding(getCellValueAsString(currentRow.getCell(12)));
+                school.setDay(currentRow.getCell(11) != null ? currentRow.getCell(11).getStringCellValue() : null);
+                school.setBoarding(currentRow.getCell(12) != null ? currentRow.getCell(12).getStringCellValue() : null);
 
                 schools.add(school);
             }
