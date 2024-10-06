@@ -13,6 +13,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.io.File;
+import java.io.FileInputStream;
 
 @Service
 public class FileProcessingService {
@@ -21,6 +23,17 @@ public class FileProcessingService {
     private SchoolRepository schoolRepository;
 
     public List<School> processSchoolFile(MultipartFile file) throws IOException {
+        return processExcelFile(file.getInputStream());
+    }
+
+    public List<School> processSchoolFileForTesting(String filePath) throws IOException {
+        File file = new File(filePath);
+        try (FileInputStream fis = new FileInputStream(file)) {
+            return processExcelFile(fis);
+        }
+    }
+
+    private List<School> processExcelFile(InputStream is) throws IOException {
         List<School> schools = new ArrayList<>();
 
         try (InputStream is = file.getInputStream();
