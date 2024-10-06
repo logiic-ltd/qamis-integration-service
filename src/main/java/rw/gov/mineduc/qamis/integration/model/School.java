@@ -1,8 +1,8 @@
 package rw.gov.mineduc.qamis.integration.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 
 @Entity
 public class School {
