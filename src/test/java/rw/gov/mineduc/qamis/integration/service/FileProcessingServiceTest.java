@@ -56,7 +56,7 @@ class FileProcessingServiceTest {
         assertEquals(-1.94486, firstSchool.getLatitude());
         assertEquals(30.05216, firstSchool.getLongitude());
         assertEquals("DAY", firstSchool.getDay());
-        assertNull(firstSchool.getBoarding());
+        assertEquals("", firstSchool.getBoarding());
     }
 
     @Test
@@ -99,6 +99,7 @@ class FileProcessingServiceTest {
         assertNotNull(school.getSchoolOwner());
         assertNotNull(school.getLatitude());
         assertNotNull(school.getLongitude());
-        // Day and Boarding can be null, so we don't assert them
+        assertNotNull(school.getDay());
+        // Boarding can be an empty string, so we don't assert it
     }
 }
