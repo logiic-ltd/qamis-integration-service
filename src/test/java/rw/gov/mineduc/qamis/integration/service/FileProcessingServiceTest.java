@@ -38,7 +38,7 @@ class FileProcessingServiceTest {
 
         assertNotNull(processedSchools);
         assertFalse(processedSchools.isEmpty());
-        assertEquals(19, processedSchools.size());
+        assertEquals(20, processedSchools.size());
 
         // Verify the content of the first school
         School firstSchool = processedSchools.get(0);
