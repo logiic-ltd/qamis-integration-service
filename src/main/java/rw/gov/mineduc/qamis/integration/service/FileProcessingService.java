@@ -36,8 +36,7 @@ public class FileProcessingService {
     private List<School> processExcelFile(InputStream is) throws IOException {
         List<School> schools = new ArrayList<>();
 
-        try (InputStream is = file.getInputStream();
-             Workbook workbook = new XSSFWorkbook(is)) {
+        try (Workbook workbook = new XSSFWorkbook(is)) {
             Sheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rows = sheet.iterator();
 
