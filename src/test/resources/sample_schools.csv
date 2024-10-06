@@ -1,0 +1,21 @@
+school_code,school_name,province,district,sector,cell,village,school_status,school_owner,latitude,longitude,day,boarding
+110101,CYAPEPE PRIMARY SCHOOL,Kigali City,Nyarugenge,Gitega,Akabahizi,Iterambere,PRIVATE,PARENTS,-1.94486,30.05216,DAY,NULL
+110103,EP GITEGA,Kigali City,Nyarugenge,Gitega,Kinyange,Uburezi,PUBLIC,GoR,-1.95978,30.05631,DAY,NULL
+110104,GS CYAHAFI,Kigali City,Nyarugenge,Gitega,Akabahizi,Iterambere,PUBLIC,GoR,-1.94472,30.05333,DAY,NULL
+110105,ITETERO NURSERY SCHOOL,Kigali City,Nyarugenge,Gitega,Akabahizi,Gihanga,PRIVATE,OTHERS,-1.9489,30,DAY,NULL
+110107,THE SOURCE NURSERY SCHOOL,Kigali City,Nyarugenge,Gitega,Kigarama,Ingenzi,PRIVATE,TEACHERS,-1.958798,30.05837,DAY,NULL
+110108,IMBYEYI CHRISTHIAN,Kigali City,Nyarugenge,Gitega,Kigarama,Sangwa,PRIVATE,INDIVIDUALS,-1.9557,30.0562,DAY,NULL
+110109,KIGALI LEADING TECHNICAL SCHOOL,Kigali City,Nyarugenge,Gitega,Kora,Kivumu,PRIVATE,OTHERS,-1.94472,30.06808,DAY,NULL
+110112,SAINT MARY IMMACULATE,Kigali City,Nyarugenge,Gitega,Kora,Rugano,PRIVATE,CATHOLIC,-1.9529738,30.0068,DAY,NULL
+110201,GS KANYINYA,Kigali City,Nyarugenge,Kanyinya,Taba,Nyarusange,GOVERNMENT_AIDED,CATHOLIC,-1.9003,29.99361,DAY,NULL
+110202,GS NZOVE,Kigali City,Nyarugenge,Kanyinya,Nzove,Ruyenzi,PUBLIC,GoR,-1.94422,30.00592,DAY,NULL
+110203,BIBUNGO NURSERYSCHOOL,Kigali City,Nyarugenge,Kanyinya,Nzove,Bibungo,PRIVATE,EPR,-1.9136,29.986,DAY,NULL
+110204,EP NYAMWERU,Kigali City,Nyarugenge,Kanyinya,Nyamweru,Ruhengeri,PUBLIC,GoR,-1.92275,30.008555,DAY,NULL
+110205,STAR SHINE SCHOOL,Kigali City,Nyarugenge,Kanyinya,Nzove,Bibungo,PRIVATE,OTHERS,-1.91333333,29.98777778,DAY,NULL
+110206,TVET KANYINYA,Kigali City,Nyarugenge,Kanyinya,Taba,Nyarusange,PUBLIC,GoR,-1.90027778,29.994444,DAY,BOARDING
+110207,ECD RWAKIVUMU,Kigali City,Nyarugenge,Kanyinya,Taba,Rwakivumu,PUBLIC,GoR,-1.888361114,29.99444444,DAY,NULL
+110208,EP BIBUNGO,Kigali City,Nyarugenge,Kanyinya,Nzove,Bibungo,PUBLIC,GoR,-1.9144662,29.9872248,DAY,NULL
+110304,FOUNDATION NURSERY SCHOOL,Kigali City,Nyarugenge,Kigali,Mwendo,Amajyambere,PRIVATE,CATHOLIC,-1.9894,30.011,DAY,NULL
+110305,GS MWENDO,Kigali City,Nyarugenge,Kigali,Mwendo,Amajyambere,GOVERNMENT_AIDED,CATHOLIC,-1.98856,30.01056,DAY,NULL
+110306,GS KIGALI,Kigali City,Nyarugenge,Kigali,Kigali,Ryasharangabo,PUBLIC,GoR,-1.96342,30.02925,DAY,NULL
+110309,ECOLE MATERNELLE RUHANGO,Kigali City,Nyarugenge,Kigali,Kigali,Ruhango,PRIVATE,PARENTS,-1.9633,30.02455,DAY,NULL
