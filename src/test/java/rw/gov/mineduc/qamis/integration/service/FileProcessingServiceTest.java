@@ -1,5 +1,6 @@
 package rw.gov.mineduc.qamis.integration.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,13 +11,12 @@ import rw.gov.mineduc.qamis.integration.repository.SchoolRepository;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class FileProcessingServiceTest {
+class FileProcessingServiceTest {
 
     @Autowired
     private FileProcessingService fileProcessingService;
@@ -24,55 +24,65 @@ public class FileProcessingServiceTest {
     @MockBean
     private SchoolRepository schoolRepository;
 
-    @Test
-    public void testProcessSchoolFile() throws IOException {
+    private List<School> processedSchools;
+
+    @BeforeEach
+    void setUp() throws IOException {
         String filePath = "src/test/resources/sample_schools.xlsx";
-        
         when(schoolRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+        processedSchools = fileProcessingService.processSchoolFileForTesting(filePath);
+    }
 
-        List<School> processedSchools = fileProcessingService.processSchoolFileForTesting(filePath);
-
+    @Test
+    void testProcessSchoolFile() {
         assertNotNull(processedSchools);
-        assertEquals(20, processedSchools.size()); // The sample file has 20 schools
+        assertEquals(20, processedSchools.size());
+    }
 
-        // Verify the content of the first school
+    @Test
+    void testSchoolProperties() {
         School firstSchool = processedSchools.get(0);
-        assertNotNull(firstSchool);
-        assertNotNull(firstSchool.getSchoolCode());
-        assertNotNull(firstSchool.getSchoolName());
-        assertNotNull(firstSchool.getProvince());
-        assertNotNull(firstSchool.getDistrict());
-        assertNotNull(firstSchool.getSector());
-        assertNotNull(firstSchool.getCell());
-        assertNotNull(firstSchool.getVillage());
-        assertNotNull(firstSchool.getSchoolStatus());
-        assertNotNull(firstSchool.getSchoolOwner());
-        assertNotNull(firstSchool.getLatitude());
-        assertNotNull(firstSchool.getLongitude());
-        assertNotNull(firstSchool.getDay());
-        assertNotNull(firstSchool.getBoarding());
+        assertAllPropertiesNotNull(firstSchool);
+    }
 
-        // Verify that all schools have been processed
-        for (School school : processedSchools) {
-            assertNotNull(school.getSchoolCode());
-            assertNotNull(school.getSchoolName());
-            // Add more assertions as needed
-        }
+    @Test
+    void testAllSchoolsProcessed() {
+        processedSchools.forEach(this::assertAllPropertiesNotNull);
+    }
 
-        // Verify some specific values
-        assertEquals("PRIVATE", processedSchools.get(0).getSchoolStatus());
-        assertEquals("PARENTS", processedSchools.get(0).getSchoolOwner());
-        assertEquals("DAY", processedSchools.get(0).getDay());
-        assertNull(processedSchools.get(0).getBoarding());
+    @Test
+    void testSpecificSchoolValues() {
+        School school0 = processedSchools.get(0);
+        assertEquals("PRIVATE", school0.getSchoolStatus());
+        assertEquals("PARENTS", school0.getSchoolOwner());
+        assertEquals("DAY", school0.getDay());
+        assertNull(school0.getBoarding());
 
-        assertEquals("PUBLIC", processedSchools.get(1).getSchoolStatus());
-        assertEquals("GoR", processedSchools.get(1).getSchoolOwner());
-        assertEquals("DAY", processedSchools.get(1).getDay());
-        assertEquals("BOARDING", processedSchools.get(1).getBoarding());
+        School school1 = processedSchools.get(1);
+        assertEquals("PUBLIC", school1.getSchoolStatus());
+        assertEquals("GoR", school1.getSchoolOwner());
+        assertEquals("DAY", school1.getDay());
+        assertEquals("BOARDING", school1.getBoarding());
 
-        assertEquals("PRIVATE", processedSchools.get(2).getSchoolStatus());
-        assertEquals("OTHERS", processedSchools.get(2).getSchoolOwner());
-        assertNull(processedSchools.get(2).getDay());
-        assertEquals("BOARDING", processedSchools.get(2).getBoarding());
+        School school2 = processedSchools.get(2);
+        assertEquals("PRIVATE", school2.getSchoolStatus());
+        assertEquals("OTHERS", school2.getSchoolOwner());
+        assertNull(school2.getDay());
+        assertEquals("BOARDING", school2.getBoarding());
+    }
+
+    private void assertAllPropertiesNotNull(School school) {
+        assertNotNull(school.getSchoolCode());
+        assertNotNull(school.getSchoolName());
+        assertNotNull(school.getProvince());
+        assertNotNull(school.getDistrict());
+        assertNotNull(school.getSector());
+        assertNotNull(school.getCell());
+        assertNotNull(school.getVillage());
+        assertNotNull(school.getSchoolStatus());
+        assertNotNull(school.getSchoolOwner());
+        assertNotNull(school.getLatitude());
+        assertNotNull(school.getLongitude());
+        // Day and Boarding can be null, so we don't assert them here
     }
 }
