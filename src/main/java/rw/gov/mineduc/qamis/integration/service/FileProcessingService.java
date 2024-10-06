@@ -77,6 +77,6 @@ public class FileProcessingService {
     }
 
     private String parseStringOrNull(String value) {
-        return value != null && !value.isEmpty() ? value : null;
+        return (value != null && !value.isEmpty() && !value.equalsIgnoreCase("NULL")) ? value : null;
     }
 }
