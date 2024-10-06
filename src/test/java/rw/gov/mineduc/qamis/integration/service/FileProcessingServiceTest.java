@@ -33,8 +33,28 @@ public class FileProcessingServiceTest {
         List<School> processedSchools = fileProcessingService.processSchoolFileForTesting(filePath);
 
         assertNotNull(processedSchools);
-        assertEquals(5, processedSchools.size()); // Assuming the sample file has 5 schools
+        assertEquals(20, processedSchools.size()); // The sample file has 20 schools
 
-        // Add more assertions to verify the content of processed schools
+        // Verify the content of the first school
+        School firstSchool = processedSchools.get(0);
+        assertNotNull(firstSchool);
+        assertNotNull(firstSchool.getSchoolCode());
+        assertNotNull(firstSchool.getSchoolName());
+        assertNotNull(firstSchool.getProvince());
+        assertNotNull(firstSchool.getDistrict());
+        assertNotNull(firstSchool.getSector());
+        assertNotNull(firstSchool.getCell());
+        assertNotNull(firstSchool.getVillage());
+        assertNotNull(firstSchool.getSchoolStatus());
+        assertNotNull(firstSchool.getSchoolOwner());
+        assertNotNull(firstSchool.getSchoolType());
+        assertNotNull(firstSchool.getLatitude());
+        assertNotNull(firstSchool.getLongitude());
+
+        // Verify that all schools have been processed
+        for (School school : processedSchools) {
+            assertNotNull(school.getSchoolCode());
+            assertNotNull(school.getSchoolName());
+        }
     }
 }
