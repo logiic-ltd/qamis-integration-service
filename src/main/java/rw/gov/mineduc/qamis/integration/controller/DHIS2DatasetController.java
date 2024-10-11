@@ -47,4 +47,10 @@ public class DHIS2DatasetController {
         int syncedCount = dhis2DatasetService.synchronizeDatasets(fromDate, datasetId, syncAll);
         return ResponseEntity.ok("Synchronized " + syncedCount + " datasets");
     }
+
+    @PostMapping("/sync/{datasetId}")
+    public ResponseEntity<String> syncSingleDataset(@PathVariable String datasetId) {
+        int syncedCount = dhis2DatasetService.synchronizeDatasets(null, datasetId, false);
+        return ResponseEntity.ok("Synchronized " + syncedCount + " dataset");
+    }
 }

@@ -82,7 +82,7 @@ public class DHIS2DatasetService {
         
         if (fromDate != null && !syncAll) {
             url += "&filter=lastUpdated:gte:" + fromDate.format(DateTimeFormatter.ISO_DATE_TIME);
-        } else if (!syncAll) {
+        } else if (!syncAll && datasetId == null) {
             LocalDateTime lastSyncTime = getLastSyncTime();
             if (lastSyncTime != null) {
                 url += "&filter=lastUpdated:gte:" + lastSyncTime.format(DateTimeFormatter.ISO_DATE_TIME);
