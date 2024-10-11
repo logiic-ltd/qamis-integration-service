@@ -28,6 +28,10 @@ public class DHIS2UserService {
 
     private static final String SYNC_INFO_ID = "DHIS2_SYNC";
 
+    // This service acts as a caching layer for DHIS2 users.
+    // It periodically synchronizes with DHIS2 and stores user data locally,
+    // allowing external applications to query user data without directly accessing DHIS2.
+
     @Autowired
     private DHIS2UserRepository dhis2UserRepository;
 
