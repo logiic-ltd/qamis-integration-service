@@ -86,9 +86,23 @@ class DHIS2DatasetControllerTest {
 
     @Test
     void testSyncDatasets() {
-        ResponseEntity<Void> response = dhis2DatasetController.syncDatasets();
+        when(dhis2DatasetService.synchronizeDatasets(any(), any(), anyBoolean())).thenReturn(5);
 
-        assertEquals(204, response.getStatusCodeValue());
-        verify(dhis2DatasetService, times(1)).synchronizeDatasets();
+        ResponseEntity<String> response = dhis2DatasetController.syncDatasets(null, null, false);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Synchronized 5 datasets", response.getBody());
+        verify(dhis2DatasetService, times(1)).synchronizeDatasets(null, null, false);
+    }
+
+    @Test
+    void testSyncSingleDataset() {
+        when(dhis2DatasetService.synchronizeDatasets(any(), eq("dataset1"), anyBoolean())).thenReturn(1);
+
+        ResponseEntity<String> response = dhis2DatasetController.syncSingleDataset("dataset1");
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Synchronized 1 dataset", response.getBody());
+        verify(dhis2DatasetService, times(1)).synchronizeDatasets(null, "dataset1", false);
     }
 }
