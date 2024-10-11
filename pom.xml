@@ -64,6 +64,11 @@
 			<artifactId>opencsv</artifactId>
 			<version>5.7.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.hisp.dhis</groupId>
+			<artifactId>dhis2-java-sdk</artifactId>
+			<version>1.1.5</version>
+		</dependency>
 	</dependencies>
 
 	<build>
