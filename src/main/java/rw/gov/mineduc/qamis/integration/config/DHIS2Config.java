@@ -9,7 +9,7 @@ public class DHIS2Config {
     private String apiUrl;
     private String username;
     private String password;
-    private long syncIntervalMinutes;
+    private String syncCron;
 
     // Getters and setters
     public String getApiUrl() {
@@ -36,11 +36,11 @@ public class DHIS2Config {
         this.password = password;
     }
 
-    public long getSyncIntervalMinutes() {
-        return syncIntervalMinutes;
+    public String getSyncCron() {
+        return syncCron;
     }
 
-    public void setSyncIntervalMinutes(long syncIntervalMinutes) {
-        this.syncIntervalMinutes = syncIntervalMinutes;
+    public void setSyncCron(String syncCron) {
+        this.syncCron = syncCron;
     }
 }

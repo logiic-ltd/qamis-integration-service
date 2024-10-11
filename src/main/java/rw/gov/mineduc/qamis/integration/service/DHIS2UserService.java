@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import rw.gov.mineduc.qamis.integration.config.DHIS2Config;
 import rw.gov.mineduc.qamis.integration.model.DHIS2User;
+import rw.gov.mineduc.qamis.integration.model.SyncInfo;
 import rw.gov.mineduc.qamis.integration.repository.DHIS2UserRepository;
+import rw.gov.mineduc.qamis.integration.repository.SyncInfoRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,16 +21,19 @@ import java.util.*;
 @Service
 public class DHIS2UserService {
 
+    private static final String SYNC_INFO_ID = "DHIS2_SYNC";
+
     @Autowired
     private DHIS2UserRepository dhis2UserRepository;
+
+    @Autowired
+    private SyncInfoRepository syncInfoRepository;
 
     @Autowired
     private DHIS2Config dhis2Config;
 
     @Autowired
     private RestTemplate restTemplate;
-
-    private static final String LAST_SYNC_KEY = "DHIS2_LAST_SYNC_TIME";
 
     public DHIS2User saveUser(DHIS2User user) {
         return dhis2UserRepository.save(user);
@@ -54,7 +59,7 @@ public class DHIS2UserService {
         return dhis2UserRepository.findByOrganisationUnitId(orgUnitId);
     }
 
-    @Scheduled(fixedRateString = "${dhis2.syncIntervalMinutes}", timeUnit = java.util.concurrent.TimeUnit.MINUTES)
+    @Scheduled(cron = "${dhis2.syncCron}")
     public void synchronizeUsers() {
         LocalDateTime lastSyncTime = getLastSyncTime();
         String url = dhis2Config.getApiUrl() + "/api/users.json?fields=id,username,displayName,firstName,surname,userCredentials[userRoles[id]],userGroups[id],organisationUnits[id],lastUpdated,disabled&paging=false";
@@ -84,12 +89,16 @@ public class DHIS2UserService {
     }
 
     private LocalDateTime getLastSyncTime() {
-        Optional<DHIS2User> lastUpdatedUser = dhis2UserRepository.findTopByOrderByLastUpdatedDesc();
-        return lastUpdatedUser.map(DHIS2User::getLastUpdated).orElse(null);
+        return syncInfoRepository.findById(SYNC_INFO_ID)
+                .map(SyncInfo::getLastSyncTime)
+                .orElse(null);
     }
 
     private void updateLastSyncTime(LocalDateTime time) {
-        // This method is no longer needed as we're using the last updated user from the database
+        SyncInfo syncInfo = syncInfoRepository.findById(SYNC_INFO_ID)
+                .orElse(new SyncInfo(SYNC_INFO_ID, time));
+        syncInfo.setLastSyncTime(time);
+        syncInfoRepository.save(syncInfo);
     }
 
     private DHIS2User mapUserData(Map<String, Object> userData) {
