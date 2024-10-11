@@ -34,6 +34,11 @@ public class DHIS2DatasetController {
         ));
     }
 
+    @GetMapping("/search/by-org-unit/{orgUnitId}")
+    public ResponseEntity<List<DHIS2Dataset>> searchDatasetsByOrgUnit(@PathVariable String orgUnitId) {
+        return ResponseEntity.ok(dhis2DatasetService.searchDatasetsByOrganisationUnit(orgUnitId));
+    }
+
     @PostMapping("/sync")
     public ResponseEntity<Void> syncDatasets() {
         dhis2DatasetService.synchronizeDatasets();
