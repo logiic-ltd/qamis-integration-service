@@ -116,7 +116,7 @@ public class DHIS2UserService {
     @Scheduled(cron = "${dhis2.syncCron}")
     public void synchronizeData() {
         synchronizeUsers(null, null, false);
-        dhis2DatasetService.synchronizeDatasets();
+        dhis2DatasetService.synchronizeDatasets(null, null, false);
     }
 
     public int synchronizeUsers(LocalDateTime fromDate, String userId, boolean syncAll) {
