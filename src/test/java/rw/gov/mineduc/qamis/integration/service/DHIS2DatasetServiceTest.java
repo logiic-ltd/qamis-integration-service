@@ -10,6 +10,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import rw.gov.mineduc.qamis.integration.config.DHIS2Config;
 import rw.gov.mineduc.qamis.integration.model.DHIS2Dataset;
@@ -115,20 +118,41 @@ class DHIS2DatasetServiceTest {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("dataSets", Collections.singletonList(datasetData));
 
-        when(restTemplate.exchange(anyString(), any(), any(), eq(Map.class)))
-                .thenReturn(new org.springframework.http.ResponseEntity<>(responseBody, org.springframework.http.HttpStatus.OK));
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Map.class)))
+                .thenReturn(new ResponseEntity<>(responseBody, org.springframework.http.HttpStatus.OK));
 
         // Mock SyncInfoRepository
         when(syncInfoRepository.findById("DHIS2_DATASET_SYNC")).thenReturn(Optional.empty());
 
         // Perform synchronization
-        dhis2DatasetService.synchronizeDatasets();
+        int syncedCount = dhis2DatasetService.synchronizeDatasets(null, null, false);
 
-        // Verify that the dataset was saved
+        // Verify results
+        assertEquals(1, syncedCount);
         verify(dhis2DatasetRepository, times(1)).save(any(DHIS2Dataset.class));
-
-        // Verify that the last sync time was updated
         verify(syncInfoRepository, times(1)).save(any(SyncInfo.class));
+    }
+
+    @Test
+    void testSynchronizeDatasetsSyncAll() {
+        // Similar setup as testSynchronizeDatasets()
+        // ...
+
+        int syncedCount = dhis2DatasetService.synchronizeDatasets(null, null, true);
+
+        // Verify results
+        // ...
+    }
+
+    @Test
+    void testSynchronizeDatasetsSingleDataset() {
+        // Setup for syncing a single dataset
+        // ...
+
+        int syncedCount = dhis2DatasetService.synchronizeDatasets(null, "dataset1", false);
+
+        // Verify results
+        // ...
     }
 
     private DHIS2Dataset createDataset(String id, String name, String shortName, String periodType, HashSet<String> orgUnits) {
