@@ -21,6 +21,7 @@ import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DHIS2UserService {
@@ -161,18 +162,18 @@ public class DHIS2UserService {
         if (userCredentials != null) {
             List<Map<String, String>> userRoles = (List<Map<String, String>>) userCredentials.get("userRoles");
             if (userRoles != null) {
-                user.setUserRoleIds(new HashSet<>(userRoles.stream().map(role -> role.get("id")).toList()));
+                user.setUserRoleIds(new HashSet<>(userRoles.stream().map(role -> role.get("id")).collect(Collectors.toList())));
             }
         }
 
         List<Map<String, String>> userGroups = (List<Map<String, String>>) userData.get("userGroups");
         if (userGroups != null) {
-            user.setUserGroupIds(new HashSet<>(userGroups.stream().map(group -> group.get("id")).toList()));
+            user.setUserGroupIds(new HashSet<>(userGroups.stream().map(group -> group.get("id")).collect(Collectors.toList())));
         }
 
         List<Map<String, String>> orgUnits = (List<Map<String, String>>) userData.get("organisationUnits");
         if (orgUnits != null) {
-            user.setOrganisationUnitIds(new HashSet<>(orgUnits.stream().map(ou -> ou.get("id")).toList()));
+            user.setOrganisationUnitIds(new HashSet<>(orgUnits.stream().map(ou -> ou.get("id")).collect(Collectors.toList())));
         }
 
         return user;
