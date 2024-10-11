@@ -119,26 +119,45 @@ public class DHIS2UserService {
         dhis2DatasetService.synchronizeDatasets();
     }
 
-    public void synchronizeUsers() {
-        LocalDateTime lastSyncTime = getLastSyncTime();
+    public int synchronizeUsers(LocalDateTime fromDate, String userId, boolean syncAll) {
         String url = dhis2Config.getApiUrl() + "/api/users.json?fields=id,username,displayName,firstName,surname,userCredentials[userRoles[id]],userGroups[id],organisationUnits[id],lastUpdated,disabled&paging=false";
         
-        if (lastSyncTime != null) {
-            url += "&filter=lastUpdated:gte:" + lastSyncTime.format(DateTimeFormatter.ISO_DATE_TIME);
+        if (fromDate != null && !syncAll) {
+            url += "&filter=lastUpdated:gte:" + fromDate.format(DateTimeFormatter.ISO_DATE_TIME);
+        } else if (!syncAll) {
+            LocalDateTime lastSyncTime = getLastSyncTime();
+            if (lastSyncTime != null) {
+                url += "&filter=lastUpdated:gte:" + lastSyncTime.format(DateTimeFormatter.ISO_DATE_TIME);
+            }
+        }
+
+        if (userId != null && !userId.isEmpty()) {
+            url += "&filter=id:eq:" + userId;
         }
 
         HttpHeaders headers = createAuthHeaders();
         ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Map.class);
         List<Map<String, Object>> users = (List<Map<String, Object>>) response.getBody().get("users");
 
+        int syncedCount = 0;
         for (Map<String, Object> userData : users) {
-            String userId = (String) userData.get("id");
-            DHIS2User user = dhis2UserRepository.findById(userId).orElse(new DHIS2User());
+            String id = (String) userData.get("id");
+            DHIS2User user = dhis2UserRepository.findById(id).orElse(new DHIS2User());
             updateUserFromData(user, userData);
             dhis2UserRepository.save(user);
+            syncedCount++;
         }
 
-        updateLastSyncTime(LocalDateTime.now());
+        if (syncAll || (fromDate == null && userId == null)) {
+            updateLastSyncTime(LocalDateTime.now());
+        }
+
+        return syncedCount;
+    }
+
+    @Scheduled(cron = "${dhis2.syncCron}")
+    public void scheduledSynchronizeUsers() {
+        synchronizeUsers(null, null, false);
     }
 
     private void updateUserFromData(DHIS2User user, Map<String, Object> userData) {

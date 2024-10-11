@@ -56,8 +56,11 @@ public class DHIS2UserController {
     }
 
     @PostMapping("/sync")
-    public ResponseEntity<Void> syncUsers() {
-        dhis2UserService.synchronizeUsers();
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> syncUsers(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+            @RequestParam(required = false) String userId,
+            @RequestParam(required = false, defaultValue = "false") boolean syncAll) {
+        int syncedCount = dhis2UserService.synchronizeUsers(fromDate, userId, syncAll);
+        return ResponseEntity.ok("Synchronized " + syncedCount + " users");
     }
 }
