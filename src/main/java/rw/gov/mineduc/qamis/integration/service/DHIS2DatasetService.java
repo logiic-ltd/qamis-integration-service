@@ -77,24 +77,43 @@ public class DHIS2DatasetService {
         return dhis2DatasetRepository.findByOrganisationUnitIdsContaining(organisationUnitId);
     }
 
-    public void synchronizeDatasets() {
-        LocalDateTime lastSyncTime = getLastSyncTime();
+    public int synchronizeDatasets(LocalDateTime fromDate, String datasetId, boolean syncAll) {
         String url = dhis2Config.getApiUrl() + "/api/dataSets.json?fields=id,name,shortName,periodType,organisationUnits[id],lastUpdated&paging=false";
         
-        if (lastSyncTime != null) {
-            url += "&filter=lastUpdated:gte:" + lastSyncTime.format(DateTimeFormatter.ISO_DATE_TIME);
+        if (fromDate != null && !syncAll) {
+            url += "&filter=lastUpdated:gte:" + fromDate.format(DateTimeFormatter.ISO_DATE_TIME);
+        } else if (!syncAll) {
+            LocalDateTime lastSyncTime = getLastSyncTime();
+            if (lastSyncTime != null) {
+                url += "&filter=lastUpdated:gte:" + lastSyncTime.format(DateTimeFormatter.ISO_DATE_TIME);
+            }
+        }
+
+        if (datasetId != null && !datasetId.isEmpty()) {
+            url += "&filter=id:eq:" + datasetId;
         }
 
         HttpHeaders headers = createAuthHeaders();
         ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Map.class);
         List<Map<String, Object>> datasets = (List<Map<String, Object>>) response.getBody().get("dataSets");
 
+        int syncedCount = 0;
         for (Map<String, Object> datasetData : datasets) {
             DHIS2Dataset dataset = mapDatasetData(datasetData);
             dhis2DatasetRepository.save(dataset);
+            syncedCount++;
         }
 
-        updateLastSyncTime(LocalDateTime.now());
+        if (syncAll || (fromDate == null && datasetId == null)) {
+            updateLastSyncTime(LocalDateTime.now());
+        }
+
+        return syncedCount;
+    }
+
+    @Scheduled(cron = "${dhis2.syncCron}")
+    public void scheduledSynchronizeDatasets() {
+        synchronizeDatasets(null, null, false);
     }
 
     private HttpHeaders createAuthHeaders() {

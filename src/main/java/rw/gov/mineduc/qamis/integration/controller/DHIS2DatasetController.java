@@ -40,8 +40,11 @@ public class DHIS2DatasetController {
     }
 
     @PostMapping("/sync")
-    public ResponseEntity<Void> syncDatasets() {
-        dhis2DatasetService.synchronizeDatasets();
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> syncDatasets(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
+            @RequestParam(required = false) String datasetId,
+            @RequestParam(required = false, defaultValue = "false") boolean syncAll) {
+        int syncedCount = dhis2DatasetService.synchronizeDatasets(fromDate, datasetId, syncAll);
+        return ResponseEntity.ok("Synchronized " + syncedCount + " datasets");
     }
 }
