@@ -132,11 +132,41 @@ public class DHIS2UserService {
         List<Map<String, Object>> users = (List<Map<String, Object>>) response.getBody().get("users");
 
         for (Map<String, Object> userData : users) {
-            DHIS2User user = mapUserData(userData);
+            String userId = (String) userData.get("id");
+            DHIS2User user = dhis2UserRepository.findById(userId).orElse(new DHIS2User());
+            updateUserFromData(user, userData);
             dhis2UserRepository.save(user);
         }
 
         updateLastSyncTime(LocalDateTime.now());
+    }
+
+    private void updateUserFromData(DHIS2User user, Map<String, Object> userData) {
+        user.setId((String) userData.get("id"));
+        user.setUsername((String) userData.get("username"));
+        user.setDisplayName((String) userData.get("displayName"));
+        user.setFirstName((String) userData.get("firstName"));
+        user.setSurname((String) userData.get("surname"));
+        user.setLastUpdated(LocalDateTime.parse((String) userData.get("lastUpdated"), DateTimeFormatter.ISO_DATE_TIME));
+        user.setDisabled((Boolean) userData.get("disabled"));
+
+        Map<String, Object> userCredentials = (Map<String, Object>) userData.get("userCredentials");
+        if (userCredentials != null) {
+            List<Map<String, String>> userRoles = (List<Map<String, String>>) userCredentials.get("userRoles");
+            if (userRoles != null) {
+                user.setUserRoleIds(new HashSet<>(userRoles.stream().map(role -> role.get("id")).collect(Collectors.toList())));
+            }
+        }
+
+        List<Map<String, String>> userGroups = (List<Map<String, String>>) userData.get("userGroups");
+        if (userGroups != null) {
+            user.setUserGroupIds(new HashSet<>(userGroups.stream().map(group -> group.get("id")).collect(Collectors.toList())));
+        }
+
+        List<Map<String, String>> orgUnits = (List<Map<String, String>>) userData.get("organisationUnits");
+        if (orgUnits != null) {
+            user.setOrganisationUnitIds(new HashSet<>(orgUnits.stream().map(ou -> ou.get("id")).collect(Collectors.toList())));
+        }
     }
 
     private HttpHeaders createAuthHeaders() {
