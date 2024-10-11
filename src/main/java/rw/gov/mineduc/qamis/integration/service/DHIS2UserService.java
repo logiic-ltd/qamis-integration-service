@@ -110,7 +110,15 @@ public class DHIS2UserService {
         dhis2UserRepository.deleteById(id);
     }
 
+    @Autowired
+    private DHIS2DatasetService dhis2DatasetService;
+
     @Scheduled(cron = "${dhis2.syncCron}")
+    public void synchronizeData() {
+        synchronizeUsers();
+        dhis2DatasetService.synchronizeDatasets();
+    }
+
     public void synchronizeUsers() {
         LocalDateTime lastSyncTime = getLastSyncTime();
         String url = dhis2Config.getApiUrl() + "/api/users.json?fields=id,username,displayName,firstName,surname,userCredentials[userRoles[id]],userGroups[id],organisationUnits[id],lastUpdated,disabled&paging=false";
