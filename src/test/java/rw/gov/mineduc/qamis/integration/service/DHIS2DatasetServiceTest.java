@@ -10,22 +10,33 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.web.client.RestTemplate;
+import rw.gov.mineduc.qamis.integration.config.DHIS2Config;
 import rw.gov.mineduc.qamis.integration.model.DHIS2Dataset;
+import rw.gov.mineduc.qamis.integration.model.SyncInfo;
 import rw.gov.mineduc.qamis.integration.repository.DHIS2DatasetRepository;
+import rw.gov.mineduc.qamis.integration.repository.SyncInfoRepository;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class DHIS2DatasetServiceTest {
 
     @Mock
     private DHIS2DatasetRepository dhis2DatasetRepository;
+
+    @Mock
+    private SyncInfoRepository syncInfoRepository;
+
+    @Mock
+    private DHIS2Config dhis2Config;
+
+    @Mock
+    private RestTemplate restTemplate;
 
     @InjectMocks
     private DHIS2DatasetService dhis2DatasetService;
@@ -81,6 +92,43 @@ class DHIS2DatasetServiceTest {
         assertEquals(2, result.size());
         assertTrue(result.stream().allMatch(ds -> ds.getOrganisationUnitIds().contains("OU2")));
         verify(dhis2DatasetRepository, times(1)).findByOrganisationUnitIdsContaining("OU2");
+    }
+
+    @Test
+    void testSynchronizeDatasets() {
+        // Mock DHIS2Config
+        when(dhis2Config.getApiUrl()).thenReturn("https://play.dhis2.org/2.39.0");
+        when(dhis2Config.getUsername()).thenReturn("admin");
+        when(dhis2Config.getPassword()).thenReturn("district");
+
+        // Mock RestTemplate response
+        Map<String, Object> datasetData = new HashMap<>();
+        datasetData.put("id", "dataset1");
+        datasetData.put("name", "Dataset 1");
+        datasetData.put("shortName", "DS1");
+        datasetData.put("periodType", "Monthly");
+        datasetData.put("lastUpdated", "2023-05-01T12:00:00.000");
+        List<Map<String, String>> orgUnits = new ArrayList<>();
+        orgUnits.add(Collections.singletonMap("id", "OU1"));
+        datasetData.put("organisationUnits", orgUnits);
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("dataSets", Collections.singletonList(datasetData));
+
+        when(restTemplate.exchange(anyString(), any(), any(), eq(Map.class)))
+                .thenReturn(new org.springframework.http.ResponseEntity<>(responseBody, org.springframework.http.HttpStatus.OK));
+
+        // Mock SyncInfoRepository
+        when(syncInfoRepository.findById("DHIS2_DATASET_SYNC")).thenReturn(Optional.empty());
+
+        // Perform synchronization
+        dhis2DatasetService.synchronizeDatasets();
+
+        // Verify that the dataset was saved
+        verify(dhis2DatasetRepository, times(1)).save(any(DHIS2Dataset.class));
+
+        // Verify that the last sync time was updated
+        verify(syncInfoRepository, times(1)).save(any(SyncInfo.class));
     }
 
     private DHIS2Dataset createDataset(String id, String name, String shortName, String periodType, HashSet<String> orgUnits) {
