@@ -64,16 +64,16 @@ public class DHIS2UserService {
             if (organisationUnitIds != null && !organisationUnitIds.isEmpty()) {
                 predicates.add(root.join("organisationUnitIds").in(organisationUnitIds));
             }
-            if (username != null) {
+            if (username != null && !username.isEmpty()) {
                 predicates.add(cb.like(cb.lower(root.get("username")), "%" + username.toLowerCase() + "%"));
             }
-            if (displayName != null) {
+            if (displayName != null && !displayName.isEmpty()) {
                 predicates.add(cb.like(cb.lower(root.get("displayName")), "%" + displayName.toLowerCase() + "%"));
             }
-            if (firstName != null) {
+            if (firstName != null && !firstName.isEmpty()) {
                 predicates.add(cb.like(cb.lower(root.get("firstName")), "%" + firstName.toLowerCase() + "%"));
             }
-            if (surname != null) {
+            if (surname != null && !surname.isEmpty()) {
                 predicates.add(cb.like(cb.lower(root.get("surname")), "%" + surname.toLowerCase() + "%"));
             }
             if (disabled != null) {
