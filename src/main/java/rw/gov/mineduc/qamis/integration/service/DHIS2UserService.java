@@ -14,9 +14,7 @@ import rw.gov.mineduc.qamis.integration.repository.DHIS2UserRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class DHIS2UserService {
@@ -29,6 +27,8 @@ public class DHIS2UserService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    private static final String LAST_SYNC_KEY = "DHIS2_LAST_SYNC_TIME";
 
     public DHIS2User saveUser(DHIS2User user) {
         return dhis2UserRepository.save(user);
@@ -57,15 +57,13 @@ public class DHIS2UserService {
     @Scheduled(fixedRateString = "${dhis2.syncIntervalMinutes}", timeUnit = java.util.concurrent.TimeUnit.MINUTES)
     public void synchronizeUsers() {
         LocalDateTime lastSyncTime = getLastSyncTime();
-        String url = dhis2Config.getApiUrl() + "/api/users.json?fields=*&paging=false";
+        String url = dhis2Config.getApiUrl() + "/api/users.json?fields=id,username,displayName,firstName,surname,userCredentials[userRoles[id]],userGroups[id],organisationUnits[id],lastUpdated,disabled&paging=false";
         
         if (lastSyncTime != null) {
-            url += "&filter=lastUpdated:gte:" + lastSyncTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            url += "&filter=lastUpdated:gte:" + lastSyncTime.format(DateTimeFormatter.ISO_DATE_TIME);
         }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Basic " + Base64.getEncoder().encodeToString((dhis2Config.getUsername() + ":" + dhis2Config.getPassword()).getBytes()));
-
+        HttpHeaders headers = createAuthHeaders();
         ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Map.class);
         List<Map<String, Object>> users = (List<Map<String, Object>>) response.getBody().get("users");
 
@@ -77,20 +75,51 @@ public class DHIS2UserService {
         updateLastSyncTime(LocalDateTime.now());
     }
 
+    private HttpHeaders createAuthHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        String auth = dhis2Config.getUsername() + ":" + dhis2Config.getPassword();
+        byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes());
+        headers.set("Authorization", "Basic " + new String(encodedAuth));
+        return headers;
+    }
+
     private LocalDateTime getLastSyncTime() {
-        // Implement logic to get the last sync time from a persistent store
-        // For simplicity, you can store it in a file or database
-        return null; // Return null for initial sync
+        Optional<DHIS2User> lastUpdatedUser = dhis2UserRepository.findTopByOrderByLastUpdatedDesc();
+        return lastUpdatedUser.map(DHIS2User::getLastUpdated).orElse(null);
     }
 
     private void updateLastSyncTime(LocalDateTime time) {
-        // Implement logic to update the last sync time in a persistent store
+        // This method is no longer needed as we're using the last updated user from the database
     }
 
     private DHIS2User mapUserData(Map<String, Object> userData) {
         DHIS2User user = new DHIS2User();
-        // Map the userData to DHIS2User object
-        // You'll need to implement this mapping based on the DHIS2 API response structure
+        user.setId((String) userData.get("id"));
+        user.setUsername((String) userData.get("username"));
+        user.setDisplayName((String) userData.get("displayName"));
+        user.setFirstName((String) userData.get("firstName"));
+        user.setSurname((String) userData.get("surname"));
+        user.setLastUpdated(LocalDateTime.parse((String) userData.get("lastUpdated"), DateTimeFormatter.ISO_DATE_TIME));
+        user.setDisabled((Boolean) userData.get("disabled"));
+
+        Map<String, Object> userCredentials = (Map<String, Object>) userData.get("userCredentials");
+        if (userCredentials != null) {
+            List<Map<String, String>> userRoles = (List<Map<String, String>>) userCredentials.get("userRoles");
+            if (userRoles != null) {
+                user.setUserRoleIds(new HashSet<>(userRoles.stream().map(role -> role.get("id")).toList()));
+            }
+        }
+
+        List<Map<String, String>> userGroups = (List<Map<String, String>>) userData.get("userGroups");
+        if (userGroups != null) {
+            user.setUserGroupIds(new HashSet<>(userGroups.stream().map(group -> group.get("id")).toList()));
+        }
+
+        List<Map<String, String>> orgUnits = (List<Map<String, String>>) userData.get("organisationUnits");
+        if (orgUnits != null) {
+            user.setOrganisationUnitIds(new HashSet<>(orgUnits.stream().map(ou -> ou.get("id")).toList()));
+        }
+
         return user;
     }
 }

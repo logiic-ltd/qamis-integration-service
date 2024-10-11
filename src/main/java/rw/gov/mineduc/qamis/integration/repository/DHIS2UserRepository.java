@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import rw.gov.mineduc.qamis.integration.model.DHIS2User;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DHIS2UserRepository extends JpaRepository<DHIS2User, String> {
 
@@ -21,4 +22,6 @@ public interface DHIS2UserRepository extends JpaRepository<DHIS2User, String> {
 
     @Query("SELECT u FROM DHIS2User u JOIN u.organisationUnitIds o WHERE o = :orgUnitId")
     List<DHIS2User> findByOrganisationUnitId(@Param("orgUnitId") String orgUnitId);
+
+    Optional<DHIS2User> findTopByOrderByLastUpdatedDesc();
 }
