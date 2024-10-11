@@ -119,8 +119,10 @@ public class DHIS2DatasetService {
     }
 
     private DHIS2Dataset mapDatasetData(Map<String, Object> datasetData) {
-        DHIS2Dataset dataset = new DHIS2Dataset();
-        dataset.setId((String) datasetData.get("id"));
+        String datasetId = (String) datasetData.get("id");
+        DHIS2Dataset dataset = dhis2DatasetRepository.findById(datasetId).orElse(new DHIS2Dataset());
+        
+        dataset.setId(datasetId);
         dataset.setName((String) datasetData.get("name"));
         dataset.setShortName((String) datasetData.get("shortName"));
         dataset.setPeriodType((String) datasetData.get("periodType"));
