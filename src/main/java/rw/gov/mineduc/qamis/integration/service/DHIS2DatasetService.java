@@ -61,7 +61,7 @@ public class DHIS2DatasetService {
                 predicates.add(cb.equal(root.get("periodType"), periodType));
             }
             if (organisationUnitIds != null && !organisationUnitIds.isEmpty()) {
-                predicates.add(root.join("organisationUnitIds").in(organisationUnitIds));
+                predicates.add(root.get("organisationUnitIds").in(organisationUnitIds));
             }
             if (lastUpdatedStart != null && lastUpdatedEnd != null) {
                 predicates.add(cb.between(root.get("lastUpdated"), lastUpdatedStart, lastUpdatedEnd));
@@ -71,6 +71,10 @@ public class DHIS2DatasetService {
         };
 
         return dhis2DatasetRepository.findAll(spec, pageable);
+    }
+
+    public List<DHIS2Dataset> searchDatasetsByOrganisationUnit(String organisationUnitId) {
+        return dhis2DatasetRepository.findByOrganisationUnitIdsContaining(organisationUnitId);
     }
 
     public void synchronizeDatasets() {
