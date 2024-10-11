@@ -135,24 +135,64 @@ class DHIS2DatasetServiceTest {
 
     @Test
     void testSynchronizeDatasetsSyncAll() {
-        // Similar setup as testSynchronizeDatasets()
-        // ...
+        // Mock DHIS2Config
+        when(dhis2Config.getApiUrl()).thenReturn("https://play.dhis2.org/2.39.0");
+        when(dhis2Config.getUsername()).thenReturn("admin");
+        when(dhis2Config.getPassword()).thenReturn("district");
 
+        // Mock RestTemplate response
+        Map<String, Object> dataset1 = createMockDatasetMap("dataset1", "Dataset 1");
+        Map<String, Object> dataset2 = createMockDatasetMap("dataset2", "Dataset 2");
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("dataSets", Arrays.asList(dataset1, dataset2));
+
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Map.class)))
+                .thenReturn(new ResponseEntity<>(responseBody, org.springframework.http.HttpStatus.OK));
+
+        // Perform synchronization
         int syncedCount = dhis2DatasetService.synchronizeDatasets(null, null, true);
 
         // Verify results
-        // ...
+        assertEquals(2, syncedCount);
+        verify(dhis2DatasetRepository, times(2)).save(any(DHIS2Dataset.class));
+        verify(syncInfoRepository, times(1)).save(any(SyncInfo.class));
     }
 
     @Test
     void testSynchronizeDatasetsSingleDataset() {
-        // Setup for syncing a single dataset
-        // ...
+        // Mock DHIS2Config
+        when(dhis2Config.getApiUrl()).thenReturn("https://play.dhis2.org/2.39.0");
+        when(dhis2Config.getUsername()).thenReturn("admin");
+        when(dhis2Config.getPassword()).thenReturn("district");
 
+        // Mock RestTemplate response
+        Map<String, Object> dataset = createMockDatasetMap("dataset1", "Dataset 1");
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("dataSets", Collections.singletonList(dataset));
+
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(Map.class)))
+                .thenReturn(new ResponseEntity<>(responseBody, org.springframework.http.HttpStatus.OK));
+
+        // Perform synchronization
         int syncedCount = dhis2DatasetService.synchronizeDatasets(null, "dataset1", false);
 
         // Verify results
-        // ...
+        assertEquals(1, syncedCount);
+        verify(dhis2DatasetRepository, times(1)).save(any(DHIS2Dataset.class));
+        verify(syncInfoRepository, never()).save(any(SyncInfo.class));
+    }
+
+    private Map<String, Object> createMockDatasetMap(String id, String name) {
+        Map<String, Object> dataset = new HashMap<>();
+        dataset.put("id", id);
+        dataset.put("name", name);
+        dataset.put("shortName", "DS" + id.substring(id.length() - 1));
+        dataset.put("periodType", "Monthly");
+        dataset.put("lastUpdated", "2023-05-01T12:00:00.000");
+        List<Map<String, String>> orgUnits = new ArrayList<>();
+        orgUnits.add(Collections.singletonMap("id", "OU1"));
+        dataset.put("organisationUnits", orgUnits);
+        return dataset;
     }
 
     private DHIS2Dataset createDataset(String id, String name, String shortName, String periodType, HashSet<String> orgUnits) {
