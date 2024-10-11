@@ -1,6 +1,9 @@
 package rw.gov.mineduc.qamis.integration.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -14,6 +17,7 @@ import rw.gov.mineduc.qamis.integration.model.SyncInfo;
 import rw.gov.mineduc.qamis.integration.repository.DHIS2UserRepository;
 import rw.gov.mineduc.qamis.integration.repository.SyncInfoRepository;
 
+import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -35,28 +39,70 @@ public class DHIS2UserService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public DHIS2User saveUser(DHIS2User user) {
+    public Page<DHIS2User> searchUsers(
+            List<String> userRoleIds,
+            List<String> userGroupIds,
+            List<String> organisationUnitIds,
+            String username,
+            String displayName,
+            String firstName,
+            String surname,
+            Boolean disabled,
+            LocalDateTime lastUpdatedStart,
+            LocalDateTime lastUpdatedEnd,
+            Pageable pageable) {
+
+        Specification<DHIS2User> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (userRoleIds != null && !userRoleIds.isEmpty()) {
+                predicates.add(root.join("userRoleIds").in(userRoleIds));
+            }
+            if (userGroupIds != null && !userGroupIds.isEmpty()) {
+                predicates.add(root.join("userGroupIds").in(userGroupIds));
+            }
+            if (organisationUnitIds != null && !organisationUnitIds.isEmpty()) {
+                predicates.add(root.join("organisationUnitIds").in(organisationUnitIds));
+            }
+            if (username != null) {
+                predicates.add(cb.like(cb.lower(root.get("username")), "%" + username.toLowerCase() + "%"));
+            }
+            if (displayName != null) {
+                predicates.add(cb.like(cb.lower(root.get("displayName")), "%" + displayName.toLowerCase() + "%"));
+            }
+            if (firstName != null) {
+                predicates.add(cb.like(cb.lower(root.get("firstName")), "%" + firstName.toLowerCase() + "%"));
+            }
+            if (surname != null) {
+                predicates.add(cb.like(cb.lower(root.get("surname")), "%" + surname.toLowerCase() + "%"));
+            }
+            if (disabled != null) {
+                predicates.add(cb.equal(root.get("disabled"), disabled));
+            }
+            if (lastUpdatedStart != null && lastUpdatedEnd != null) {
+                predicates.add(cb.between(root.get("lastUpdated"), lastUpdatedStart, lastUpdatedEnd));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return dhis2UserRepository.findAll(spec, pageable);
+    }
+
+    public DHIS2User createUser(DHIS2User user) {
+        // TODO: Implement DHIS2 API call to create user
         return dhis2UserRepository.save(user);
     }
 
-    public List<DHIS2User> searchUsersByName(String name) {
-        return dhis2UserRepository.findByDisplayNameContainingIgnoreCase(name);
+    public DHIS2User updateUser(String id, DHIS2User user) {
+        // TODO: Implement DHIS2 API call to update user
+        user.setId(id);
+        return dhis2UserRepository.save(user);
     }
 
-    public List<DHIS2User> searchUsersByUsername(String username) {
-        return dhis2UserRepository.findByUsernameContainingIgnoreCase(username);
-    }
-
-    public List<DHIS2User> searchUsersByRole(String roleId) {
-        return dhis2UserRepository.findByUserRoleId(roleId);
-    }
-
-    public List<DHIS2User> searchUsersByGroup(String groupId) {
-        return dhis2UserRepository.findByUserGroupId(groupId);
-    }
-
-    public List<DHIS2User> searchUsersByOrganisationUnit(String orgUnitId) {
-        return dhis2UserRepository.findByOrganisationUnitId(orgUnitId);
+    public void deleteUser(String id) {
+        // TODO: Implement DHIS2 API call to delete user
+        dhis2UserRepository.deleteById(id);
     }
 
     @Scheduled(cron = "${dhis2.syncCron}")
