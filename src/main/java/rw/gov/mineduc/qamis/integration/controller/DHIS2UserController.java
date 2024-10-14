@@ -19,6 +19,28 @@ public class DHIS2UserController {
     @Autowired
     private DHIS2UserService dhis2UserService;
 
+    /**
+     * Search for DHIS2 users based on various criteria.
+     *
+     * This endpoint allows searching for DHIS2 users with flexible filtering options.
+     * All parameters are optional and can be combined for more specific searches.
+     *
+     * @param userRoleIds List of user role IDs to filter by
+     * @param userGroupIds List of user group IDs to filter by
+     * @param organisationUnitIds List of organisation unit IDs to filter by
+     * @param username Username to search for (partial match)
+     * @param displayName Display name to search for (partial match)
+     * @param firstName First name to search for (partial match)
+     * @param surname Surname to search for (partial match)
+     * @param disabled Filter by user disabled status
+     * @param lastUpdatedStart Start date for last updated filter
+     * @param lastUpdatedEnd End date for last updated filter
+     * @param pageable Pagination information (page, size, sort)
+     * @return A page of DHIS2User objects matching the search criteria
+     *
+     * Example usage:
+     * GET /api/dhis2users/search?username=john&userGroupIds=group1,group2&page=0&size=20&sort=username,asc
+     */
     @GetMapping("/search")
     public ResponseEntity<Page<DHIS2User>> searchUsers(
             @RequestParam(required = false) List<String> userRoleIds,
