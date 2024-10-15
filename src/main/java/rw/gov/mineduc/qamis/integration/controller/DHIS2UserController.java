@@ -117,4 +117,20 @@ public class DHIS2UserController {
         int syncedCount = dhis2UserService.synchronizeUsers(null, null, true);
         return ResponseEntity.ok("Performed full synchronization. Synchronized " + syncedCount + " users");
     }
+
+    /**
+     * Manually trigger synchronization for a specific DHIS2 user.
+     *
+     * @param userId The ID of the DHIS2 user to synchronize
+     * @return ResponseEntity with a message indicating the result of the synchronization
+     */
+    @PostMapping("/sync/user/{userId}")
+    public ResponseEntity<String> syncSingleUser(@PathVariable String userId) {
+        int syncedCount = dhis2UserService.synchronizeUsers(null, userId, false);
+        if (syncedCount > 0) {
+            return ResponseEntity.ok("Successfully synchronized user with ID: " + userId);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
