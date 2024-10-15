@@ -11,6 +11,7 @@ import rw.gov.mineduc.qamis.integration.service.DHIS2UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Arrays;
 
 @RestController
 @RequestMapping("/api/dhis2users")
