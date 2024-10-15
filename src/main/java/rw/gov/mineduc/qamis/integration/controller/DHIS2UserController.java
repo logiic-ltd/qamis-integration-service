@@ -138,4 +138,20 @@ public class DHIS2UserController {
             return ResponseEntity.status(500).body("Error synchronizing user: " + e.getMessage());
         }
     }
+
+    /**
+     * Trigger synchronization to fetch all users from DHIS2.
+     *
+     * @return ResponseEntity with a message indicating the result of the synchronization
+     */
+    @PostMapping("/sync/all")
+    public ResponseEntity<String> syncAllUsers() {
+        try {
+            int syncedCount = dhis2UserService.synchronizeUsers(null, null, true);
+            return ResponseEntity.ok("Successfully synchronized " + syncedCount + " users from DHIS2");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error synchronizing users: " + e.getMessage());
+        }
+    }
 }
