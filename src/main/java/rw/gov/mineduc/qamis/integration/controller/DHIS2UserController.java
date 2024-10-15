@@ -106,4 +106,15 @@ public class DHIS2UserController {
         int syncedCount = dhis2UserService.synchronizeUsers(fromDate, userId, syncAll);
         return ResponseEntity.ok("Synchronized " + syncedCount + " users");
     }
+
+    /**
+     * Manually trigger a full synchronization of DHIS2 users.
+     *
+     * @return ResponseEntity with a message indicating the number of users synchronized
+     */
+    @PostMapping("/sync/full")
+    public ResponseEntity<String> fullSync() {
+        int syncedCount = dhis2UserService.synchronizeUsers(null, null, true);
+        return ResponseEntity.ok("Performed full synchronization. Synchronized " + syncedCount + " users");
+    }
 }
