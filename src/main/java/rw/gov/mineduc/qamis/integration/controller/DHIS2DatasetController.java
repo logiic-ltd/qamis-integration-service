@@ -55,6 +55,25 @@ public class DHIS2DatasetController {
         ));
     }
 
+    /**
+     * Search for DHIS2 datasets by name (flexible search).
+     *
+     * This endpoint allows searching for DHIS2 datasets by their name, short name, or any partial match.
+     *
+     * @param name Name to search for (partial match, case-insensitive)
+     * @param pageable Pagination information (page, size, sort)
+     * @return A page of DHIS2Dataset objects matching the search criteria
+     *
+     * Example usage:
+     * GET /api/dhis2datasets/search/flexible?name=school&page=0&size=20&sort=name,asc
+     */
+    @GetMapping("/search/flexible")
+    public ResponseEntity<Page<DHIS2Dataset>> searchDatasetsFlexible(
+            @RequestParam String name,
+            Pageable pageable) {
+        return ResponseEntity.ok(dhis2DatasetService.searchDatasetsFlexible(name, pageable));
+    }
+
     @GetMapping
     public ResponseEntity<Page<DHIS2Dataset>> getAllDatasets(Pageable pageable) {
         return ResponseEntity.ok(dhis2DatasetService.getAllDatasets(pageable));

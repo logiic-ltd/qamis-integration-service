@@ -74,6 +74,19 @@ public class DHIS2DatasetService {
         return dhis2DatasetRepository.findAll(spec, pageable);
     }
 
+    public Page<DHIS2Dataset> searchDatasetsFlexible(String name, Pageable pageable) {
+        Specification<DHIS2Dataset> spec = (root, query, cb) -> {
+            String lowercaseName = "%" + name.toLowerCase() + "%";
+            return cb.or(
+                cb.like(cb.lower(root.get("name")), lowercaseName),
+                cb.like(cb.lower(root.get("shortName")), lowercaseName),
+                cb.like(cb.lower(root.get("id")), lowercaseName)
+            );
+        };
+
+        return dhis2DatasetRepository.findAll(spec, pageable);
+    }
+
     public Page<DHIS2Dataset> getAllDatasets(Pageable pageable) {
         return dhis2DatasetRepository.findAll(pageable);
     }
