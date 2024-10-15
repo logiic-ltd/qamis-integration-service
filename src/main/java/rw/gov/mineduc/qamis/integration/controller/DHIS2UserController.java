@@ -20,6 +20,27 @@ public class DHIS2UserController {
     private DHIS2UserService dhis2UserService;
 
     /**
+     * Search for DHIS2 users by name.
+     *
+     * This endpoint allows searching for DHIS2 users by their display name, first name, or surname.
+     *
+     * @param name Name to search for (matches display name, first name, or surname)
+     * @param pageable Pagination information (page, size, sort)
+     * @return A page of DHIS2User objects matching the search criteria
+     *
+     * Example usage:
+     * GET /api/dhis2users/search/name?name=John&page=0&size=20&sort=username,asc
+     */
+    @GetMapping("/search/name")
+    public ResponseEntity<Page<DHIS2User>> searchUsersByName(
+            @RequestParam String name,
+            Pageable pageable) {
+        return ResponseEntity.ok(dhis2UserService.searchUsers(
+                null, null, null, null, name, name, name, null, null, null, pageable
+        ));
+    }
+
+    /**
      * Search for DHIS2 users based on various criteria.
      *
      * This endpoint allows searching for DHIS2 users with flexible filtering options.
