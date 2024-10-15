@@ -126,11 +126,16 @@ public class DHIS2UserController {
      */
     @PostMapping("/sync/user/{userId}")
     public ResponseEntity<String> syncSingleUser(@PathVariable String userId) {
-        int syncedCount = dhis2UserService.synchronizeUsers(null, userId, false);
-        if (syncedCount > 0) {
-            return ResponseEntity.ok("Successfully synchronized user with ID: " + userId);
-        } else {
-            return ResponseEntity.notFound().build();
+        try {
+            int syncedCount = dhis2UserService.synchronizeUsers(null, userId, false);
+            if (syncedCount > 0) {
+                return ResponseEntity.ok("Successfully synchronized user with ID: " + userId);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error synchronizing user: " + e.getMessage());
         }
     }
 }

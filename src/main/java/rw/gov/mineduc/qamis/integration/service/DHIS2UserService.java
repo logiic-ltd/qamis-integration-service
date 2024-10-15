@@ -137,11 +137,30 @@ public class DHIS2UserService {
 
         HttpHeaders headers = createAuthHeaders();
         ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Map.class);
+        
+        if (response.getBody() == null) {
+            System.err.println("Error: Received null response body from DHIS2 API");
+            return 0;
+        }
+
         List<Map<String, Object>> users = (List<Map<String, Object>>) response.getBody().get("users");
+        
+        if (users == null) {
+            System.err.println("Error: No users found in the response from DHIS2 API");
+            return 0;
+        }
 
         int syncedCount = 0;
         for (Map<String, Object> userData : users) {
+            if (userData == null) {
+                System.err.println("Error: Encountered null user data");
+                continue;
+            }
             String id = (String) userData.get("id");
+            if (id == null || id.isEmpty()) {
+                System.err.println("Error: User data missing ID");
+                continue;
+            }
             DHIS2User user = dhis2UserRepository.findById(id).orElse(new DHIS2User());
             updateUserFromData(user, userData);
             dhis2UserRepository.save(user);
