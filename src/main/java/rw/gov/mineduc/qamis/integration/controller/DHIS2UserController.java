@@ -36,9 +36,10 @@ public class DHIS2UserController {
             @RequestParam String name,
             Pageable pageable) {
         String[] nameParts = name.split("\\s+");
+        String firstName = nameParts[0];
+        String lastName = nameParts.length > 1 ? String.join(" ", Arrays.copyOfRange(nameParts, 1, nameParts.length)) : null;
         return ResponseEntity.ok(dhis2UserService.searchUsers(
-                null, null, null, name, name, nameParts[0], 
-                nameParts.length > 1 ? nameParts[nameParts.length - 1] : null, 
+                null, null, null, name, name, firstName, lastName, 
                 null, null, null, pageable
         ));
     }

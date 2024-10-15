@@ -80,6 +80,9 @@ public class DHIS2UserService {
             if (surname != null && !surname.isEmpty()) {
                 namePredicates.add(cb.like(cb.lower(root.get("surname")), "%" + surname.toLowerCase() + "%"));
             }
+            if (displayName != null && !displayName.isEmpty()) {
+                namePredicates.add(cb.like(cb.lower(root.get("displayName")), "%" + displayName.toLowerCase() + "%"));
+            }
             if (!namePredicates.isEmpty()) {
                 predicates.add(cb.or(namePredicates.toArray(new Predicate[0])));
             }
