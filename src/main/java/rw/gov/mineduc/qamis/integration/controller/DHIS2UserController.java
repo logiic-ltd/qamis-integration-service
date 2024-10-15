@@ -36,7 +36,7 @@ public class DHIS2UserController {
             @RequestParam String name,
             Pageable pageable) {
         return ResponseEntity.ok(dhis2UserService.searchUsers(
-                null, null, null, null, name, name, name, null, null, null, pageable
+                null, null, null, name, name, name, name, null, null, null, pageable
         ));
     }
 

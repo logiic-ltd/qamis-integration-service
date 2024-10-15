@@ -70,16 +70,12 @@ public class DHIS2UserService {
                 predicates.add(root.join("organisationUnitIds").in(organisationUnitIds));
             }
             if (username != null && !username.isEmpty()) {
-                predicates.add(cb.like(cb.lower(root.get("username")), "%" + username.toLowerCase() + "%"));
-            }
-            if (displayName != null && !displayName.isEmpty()) {
-                predicates.add(cb.like(cb.lower(root.get("displayName")), "%" + displayName.toLowerCase() + "%"));
-            }
-            if (firstName != null && !firstName.isEmpty()) {
-                predicates.add(cb.like(cb.lower(root.get("firstName")), "%" + firstName.toLowerCase() + "%"));
-            }
-            if (surname != null && !surname.isEmpty()) {
-                predicates.add(cb.like(cb.lower(root.get("surname")), "%" + surname.toLowerCase() + "%"));
+                predicates.add(cb.or(
+                    cb.like(cb.lower(root.get("username")), "%" + username.toLowerCase() + "%"),
+                    cb.like(cb.lower(root.get("displayName")), "%" + username.toLowerCase() + "%"),
+                    cb.like(cb.lower(root.get("firstName")), "%" + username.toLowerCase() + "%"),
+                    cb.like(cb.lower(root.get("surname")), "%" + username.toLowerCase() + "%")
+                ));
             }
             if (disabled != null) {
                 predicates.add(cb.equal(root.get("disabled"), disabled));
