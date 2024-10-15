@@ -34,6 +34,27 @@ public class DHIS2DatasetController {
         ));
     }
 
+    /**
+     * Search for DHIS2 datasets by name.
+     *
+     * This endpoint allows searching for DHIS2 datasets by their name or short name.
+     *
+     * @param name Name or short name to search for (partial match, case-insensitive)
+     * @param pageable Pagination information (page, size, sort)
+     * @return A page of DHIS2Dataset objects matching the search criteria
+     *
+     * Example usage:
+     * GET /api/dhis2datasets/search/name?name=monthly&page=0&size=20&sort=name,asc
+     */
+    @GetMapping("/search/name")
+    public ResponseEntity<Page<DHIS2Dataset>> searchDatasetsByName(
+            @RequestParam String name,
+            Pageable pageable) {
+        return ResponseEntity.ok(dhis2DatasetService.searchDatasets(
+                name, name, null, null, null, null, pageable
+        ));
+    }
+
     @GetMapping
     public ResponseEntity<Page<DHIS2Dataset>> getAllDatasets(Pageable pageable) {
         return ResponseEntity.ok(dhis2DatasetService.getAllDatasets(pageable));
