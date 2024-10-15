@@ -105,4 +105,55 @@ class DHIS2DatasetControllerTest {
         assertEquals("Synchronized 1 dataset", response.getBody());
         verify(dhis2DatasetService, times(1)).synchronizeDatasets(null, "dataset1", false);
     }
+
+    @Test
+    void testSearchDatasetsByName() {
+        DHIS2Dataset dataset = new DHIS2Dataset();
+        dataset.setId("1");
+        dataset.setName("Test Dataset");
+        dataset.setShortName("TDS");
+
+        Page<DHIS2Dataset> page = new PageImpl<>(Collections.singletonList(dataset));
+
+        when(dhis2DatasetService.searchDatasets(
+                eq("Test Dataset"), eq("Test Dataset"), eq(null), eq(null),
+                eq(null), eq(null), any(Pageable.class)))
+                .thenReturn(page);
+
+        ResponseEntity<Page<DHIS2Dataset>> response = dhis2DatasetController.searchDatasetsByName("Test Dataset", Pageable.unpaged());
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(1, response.getBody().getTotalElements());
+        assertEquals("Test Dataset", response.getBody().getContent().get(0).getName());
+    }
+
+    @Test
+    void testSearchDatasetsFlexible() {
+        DHIS2Dataset dataset = new DHIS2Dataset();
+        dataset.setId("1");
+        dataset.setName("Flexible Dataset");
+        dataset.setShortName("FDS");
+
+        Page<DHIS2Dataset> page = new PageImpl<>(Collections.singletonList(dataset));
+
+        when(dhis2DatasetService.searchDatasetsFlexible(eq("Flexible"), any(Pageable.class)))
+                .thenReturn(page);
+
+        ResponseEntity<Page<DHIS2Dataset>> response = dhis2DatasetController.searchDatasetsFlexible("Flexible", Pageable.unpaged());
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(1, response.getBody().getTotalElements());
+        assertEquals("Flexible Dataset", response.getBody().getContent().get(0).getName());
+    }
+
+    @Test
+    void testSyncAllDatasets() {
+        when(dhis2DatasetService.synchronizeDatasets(null, null, true)).thenReturn(10);
+
+        ResponseEntity<String> response = dhis2DatasetController.syncAllDatasets();
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Synchronized 10 datasets", response.getBody());
+        verify(dhis2DatasetService, times(1)).synchronizeDatasets(null, null, true);
+    }
 }

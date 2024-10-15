@@ -117,4 +117,48 @@ class DHIS2UserControllerTest {
         assertEquals(1, response.getBody().getTotalElements());
         assertEquals("groupuser", response.getBody().getContent().get(0).getUsername());
     }
+
+    @Test
+    void testSearchUsersByName() {
+        DHIS2User user = new DHIS2User();
+        user.setId("1");
+        user.setUsername("johnsmith");
+        user.setDisplayName("John Smith");
+        user.setFirstName("John");
+        user.setSurname("Smith");
+
+        Page<DHIS2User> page = new PageImpl<>(Collections.singletonList(user));
+
+        when(dhis2UserService.searchUsers(
+                eq(null), eq(null), eq(null), eq("John Smith"), eq("John Smith"),
+                eq("John"), eq("Smith"), eq(null), eq(null), eq(null), any(Pageable.class)))
+                .thenReturn(page);
+
+        ResponseEntity<Page<DHIS2User>> response = dhis2UserController.searchUsersByName("John Smith", Pageable.unpaged());
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(1, response.getBody().getTotalElements());
+        assertEquals("johnsmith", response.getBody().getContent().get(0).getUsername());
+        assertEquals("John Smith", response.getBody().getContent().get(0).getDisplayName());
+    }
+
+    @Test
+    void testSyncUsers() {
+        when(dhis2UserService.synchronizeUsers(any(), any(), anyBoolean())).thenReturn(5);
+
+        ResponseEntity<String> response = dhis2UserController.syncUsers(null, null, false);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Synchronized 5 users", response.getBody());
+    }
+
+    @Test
+    void testSyncAllUsers() {
+        when(dhis2UserService.synchronizeUsers(null, null, true)).thenReturn(10);
+
+        ResponseEntity<String> response = dhis2UserController.syncAllUsers();
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Successfully synchronized 10 users from DHIS2", response.getBody());
+    }
 }
