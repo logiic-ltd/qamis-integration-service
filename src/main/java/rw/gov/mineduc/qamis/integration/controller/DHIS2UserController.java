@@ -35,8 +35,11 @@ public class DHIS2UserController {
     public ResponseEntity<Page<DHIS2User>> searchUsersByName(
             @RequestParam String name,
             Pageable pageable) {
+        String[] nameParts = name.split("\\s+");
         return ResponseEntity.ok(dhis2UserService.searchUsers(
-                null, null, null, name, name, name, name, null, null, null, pageable
+                null, null, null, name, name, nameParts[0], 
+                nameParts.length > 1 ? nameParts[nameParts.length - 1] : null, 
+                null, null, null, pageable
         ));
     }
 
