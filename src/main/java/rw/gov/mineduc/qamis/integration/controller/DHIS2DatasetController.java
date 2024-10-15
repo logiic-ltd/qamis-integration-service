@@ -34,6 +34,11 @@ public class DHIS2DatasetController {
         ));
     }
 
+    @GetMapping
+    public ResponseEntity<Page<DHIS2Dataset>> getAllDatasets(Pageable pageable) {
+        return ResponseEntity.ok(dhis2DatasetService.getAllDatasets(pageable));
+    }
+
     @GetMapping("/search/by-org-unit/{orgUnitId}")
     public ResponseEntity<List<DHIS2Dataset>> searchDatasetsByOrgUnit(@PathVariable String orgUnitId) {
         return ResponseEntity.ok(dhis2DatasetService.searchDatasetsByOrganisationUnit(orgUnitId));

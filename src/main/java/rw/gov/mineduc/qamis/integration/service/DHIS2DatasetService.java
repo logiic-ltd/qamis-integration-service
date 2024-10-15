@@ -74,6 +74,10 @@ public class DHIS2DatasetService {
         return dhis2DatasetRepository.findAll(spec, pageable);
     }
 
+    public Page<DHIS2Dataset> getAllDatasets(Pageable pageable) {
+        return dhis2DatasetRepository.findAll(pageable);
+    }
+
     public List<DHIS2Dataset> searchDatasetsByOrganisationUnit(String organisationUnitId) {
         return dhis2DatasetRepository.findByOrganisationUnitIdsContaining(organisationUnitId);
     }
