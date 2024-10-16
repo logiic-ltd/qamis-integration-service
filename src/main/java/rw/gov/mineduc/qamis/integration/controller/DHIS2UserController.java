@@ -24,6 +24,7 @@ public class DHIS2UserController {
      * Search for DHIS2 users by name.
      *
      * This endpoint allows searching for DHIS2 users by their display name, first name, or surname.
+     * The search is case-insensitive and matches any part of the name.
      *
      * @param name Name to search for (matches display name, first name, or surname)
      * @param pageable Pagination information (page, size, sort)
@@ -31,6 +32,7 @@ public class DHIS2UserController {
      *
      * Example usage:
      * GET /api/dhis2users/search/name?name=John&page=0&size=20&sort=username,asc
+     * GET /api/dhis2users/search/name?name=ht&page=0&size=20&sort=username,asc
      */
     @GetMapping("/search/name")
     public ResponseEntity<Page<DHIS2User>> searchUsersByName(
