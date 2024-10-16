@@ -32,7 +32,11 @@ public class DHIS2UserController {
      *
      * Example usage:
      * GET /api/dhis2users/search/name?name=John&page=0&size=20&sort=username,asc
-     * GET /api/dhis2users/search/name?name=ht&page=0&size=20&sort=username,asc
+     * This will search for users with "John" in their name, username, or display name.
+     * 
+     * GET /api/dhis2users/search/name?name=John Doe&page=0&size=20&sort=username,asc
+     * This will search for users with "John" in their first name and "Doe" in their last name,
+     * or "John Doe" in their display name or username.
      */
     @GetMapping("/search/name")
     public ResponseEntity<Page<DHIS2User>> searchUsersByName(
