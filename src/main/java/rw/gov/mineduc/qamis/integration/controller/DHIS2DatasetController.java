@@ -50,9 +50,7 @@ public class DHIS2DatasetController {
     public ResponseEntity<Page<DHIS2Dataset>> searchDatasetsByName(
             @RequestParam String name,
             Pageable pageable) {
-        return ResponseEntity.ok(dhis2DatasetService.searchDatasets(
-                name, name, null, null, null, null, pageable
-        ));
+        return ResponseEntity.ok(dhis2DatasetService.searchDatasetsFlexible(name, pageable));
     }
 
     /**
