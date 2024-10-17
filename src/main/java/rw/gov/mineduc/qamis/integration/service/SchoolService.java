@@ -58,12 +58,12 @@ public class SchoolService {
         return result;
     }
 
-    public Page<School> searchSchools(String schoolName, Pageable pageable) {
+    public Page<School> searchSchools(String searchTerm, Pageable pageable) {
         Specification<School> spec = (root, query, cb) -> {
-            String lowercaseName = "%" + schoolName.toLowerCase() + "%";
+            String lowercaseSearchTerm = "%" + searchTerm.toLowerCase() + "%";
             return cb.or(
-                cb.like(cb.lower(root.get("schoolName")), lowercaseName),
-                cb.like(cb.lower(root.get("schoolCode").as(String.class)), lowercaseName)
+                cb.like(cb.lower(root.get("schoolName")), lowercaseSearchTerm),
+                cb.like(cb.lower(root.get("schoolCode").as(String.class)), lowercaseSearchTerm)
             );
         };
 

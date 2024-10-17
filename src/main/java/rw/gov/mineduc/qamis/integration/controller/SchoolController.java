@@ -51,7 +51,7 @@ public class SchoolController {
             @RequestParam String name,
             Pageable pageable) {
         Page<School> schools = schoolService.searchSchools(name, pageable);
-        Page<Map<String, Object>> schoolSummaries = schools.map(school -> schoolService.getSchoolSummary(school));
+        Page<Map<String, Object>> schoolSummaries = schools.map(schoolService::getSchoolSummary);
         return ResponseEntity.ok(schoolSummaries);
     }
 }
