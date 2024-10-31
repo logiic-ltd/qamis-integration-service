@@ -7,6 +7,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import java.util.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -36,7 +37,9 @@ public class QamisIntegrationService {
             String url = qamisConfig.getApiUrl() + "/api/resource/Inspection?filters=[[\"workflow_state\",\"=\",\"Approved by DG\"]]&fields=[\"name\",\"inspection_name\",\"workflow_state\",\"modified\"]";
             
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "token " + qamisConfig.getApiKey());
+            String auth = qamisConfig.getUsername() + ":" + qamisConfig.getPassword();
+            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes());
+            headers.set("Authorization", "Basic " + new String(encodedAuth));
             
             ResponseEntity<Map> response = restTemplate.exchange(
                 url,
