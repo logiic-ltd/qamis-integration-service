@@ -74,17 +74,22 @@ public class InspectionService {
             validateInspection(inspection);
             
             Optional<Inspection> existingInspectionOpt = inspectionRepository.findById(inspection.getName());
+            boolean isUpdate = existingInspectionOpt.isPresent();
             
-            if (existingInspectionOpt.isPresent()) {
+            if (isUpdate) {
                 Inspection existingInspection = existingInspectionOpt.get();
                 if (!shouldSyncInspection(existingInspection, inspection)) {
-                    log.debug("Skipping sync for inspection {}, no updates needed", inspection.getName());
                     return;
                 }
+                log.info("Updating existing inspection: {} (Last modified: {})", 
+                    inspection.getName(), existingInspection.getLastModified());
+                
                 // Clear existing relationships to prevent orphaned records
                 existingInspection.getTeams().clear();
                 existingInspection.getChecklists().clear();
                 inspectionRepository.save(existingInspection);
+            } else {
+                log.info("Creating new inspection: {}", inspection.getName());
             }
 
             log.debug("Syncing inspection data for: {}", inspection.getName());
@@ -97,9 +102,12 @@ public class InspectionService {
             syncChecklists(inspection);
             
             // Final save to update all relationships
-            inspectionRepository.save(inspection);
+            inspection = inspectionRepository.save(inspection);
             
-            log.info("Successfully synced inspection: {}", inspection.getName());
+            log.info("Successfully {} inspection: {} (Last modified: {})", 
+                (isUpdate ? "updated" : "created"),
+                inspection.getName(), 
+                inspection.getLastModified());
         } catch (Exception e) {
             log.error("Error during inspection sync {}: {}", inspection.getName(), e.getMessage());
             throw new InspectionSyncException("Failed to sync inspection: " + inspection.getName(), e);
