@@ -134,3 +134,64 @@ Contributions to the QAMIS Integration Service are welcome. Please follow these 
 ## Contact
 
 For any queries or support, please contact [Your Contact Information].
+## Inspection Data Synchronization
+
+The system implements automated synchronization of inspection data from QAMIS (Quality Assurance Management Information System). This process involves fetching approved inspections and their related entities (teams, members, schools, and checklists) and storing them in the local database.
+
+### Architecture Overview
+
+The synchronization process follows a layered architecture:
+
+1. **Configuration Layer**
+   - `QamisConfig`: Manages API configuration (URL, credentials)
+   - Properties configured in `application.properties`
+
+2. **Integration Layer**
+   - `QamisIntegrationService`: Handles API communication
+   - Implements methods for fetching approved inspections and their details
+   - Uses `RestTemplate` for HTTP requests
+   - Implements proper error handling with `QamisApiException`
+
+3. **Service Layer**
+   - `InspectionService`: Manages business logic and data synchronization
+   - Handles entity relationships and validation
+   - Implements scheduled synchronization
+   - Manages transaction boundaries
+
+4. **Domain Model**
+   - `Inspection`: Parent entity for inspection data
+   - `InspectionTeam`: Represents inspection teams
+   - `TeamMember`: Team member details
+   - `TeamSchool`: Schools assigned to teams
+   - `InspectionChecklist`: Inspection checklists
+
+### Synchronization Process
+
+The synchronization follows these steps:
+
+1. Scheduled task triggers (`@Scheduled`)
+2. Fetch list of approved inspections
+3. For each approved inspection:
+   - Fetch full inspection details
+   - Convert DTO to domain entities
+   - Validate all entities
+   - Sync teams and their members
+   - Sync school assignments
+   - Sync checklists
+   - Save all relationships
+
+### Error Handling
+
+- Custom exceptions for API and sync errors
+- Proper transaction management
+- Detailed logging at each step
+- Validation for all entities
+
+### Configuration
+
+Configure the synchronization in `application.properties`:
+
+```properties
+qamis.apiUrl=http://qamis.localhost:8000
+inspection.syncCron=0 0/30 * * * ?  # Every 30 minutes
+```
