@@ -175,6 +175,31 @@ public class InspectionService {
                 team.setName((String) teamData.get("name"));
                 team.setTeamName((String) teamData.get("team_name"));
                 team.setInspection(inspection);
+                
+                // Handle team members
+                List<Map<String, Object>> members = (List<Map<String, Object>>) teamData.get("members");
+                if (members != null) {
+                    for (Map<String, Object> memberData : members) {
+                        TeamMember member = new TeamMember();
+                        member.setName((String) memberData.get("name"));
+                        member.setRole((String) memberData.get("role"));
+                        member.setTeam(team);
+                        team.getMembers().add(member);
+                    }
+                }
+                
+                // Handle team schools
+                List<Map<String, Object>> schools = (List<Map<String, Object>>) teamData.get("schools");
+                if (schools != null) {
+                    for (Map<String, Object> schoolData : schools) {
+                        TeamSchool school = new TeamSchool();
+                        school.setSchoolCode((String) schoolData.get("school_code"));
+                        school.setSchoolName((String) schoolData.get("school_name"));
+                        school.setTeam(team);
+                        team.getSchools().add(school);
+                    }
+                }
+                
                 inspection.getTeams().add(team);
             }
         }
