@@ -31,7 +31,16 @@ public class QamisIntegrationService {
     public List<InspectionDTO> fetchApprovedInspections() {
         try {
             String url = qamisConfig.getApiUrl() + "/api/resource/Inspection?filters=[[\"workflow_state\",\"=\",\"Approved by DG\"]]&fields=[\"name\",\"inspection_name\",\"workflow_state\",\"modified\"]";
-            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "token " + qamisConfig.getApiKey());
+            
+            ResponseEntity<Map> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                Map.class
+            );
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new QamisApiException("QAMIS API returned error status: " + response.getStatusCode(), 
                     response.getStatusCode().value());
@@ -80,7 +89,16 @@ public class QamisIntegrationService {
         try {
             // Fetch basic inspection details
             String url = qamisConfig.getApiUrl() + "/api/resource/Inspection/" + inspectionId;
-            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "token " + qamisConfig.getApiKey());
+            
+            ResponseEntity<Map> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                Map.class
+            );
             
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new QamisApiException("QAMIS API returned error status: " + response.getStatusCode(), 
@@ -126,7 +144,16 @@ public class QamisIntegrationService {
     public List<Map<String, Object>> fetchInspectionTeams(String inspectionId) {
         try {
             String url = qamisConfig.getApiUrl() + "/api/resource/Inspection%20Team?filters=[[\"inspection\",\"=\",\"" + inspectionId + "\"]]";
-            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "token " + qamisConfig.getApiKey());
+            
+            ResponseEntity<Map> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                Map.class
+            );
             
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new QamisApiException("QAMIS API returned error status when fetching teams: " + response.getStatusCode(), 
