@@ -74,6 +74,7 @@ public class QamisIntegrationService {
         }
 
         try {
+            // Fetch basic inspection details
             String url = qamisConfig.getApiUrl() + "/api/resource/Inspection/" + inspectionId;
             ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
             
@@ -103,6 +104,9 @@ public class QamisIntegrationService {
             dto.setCustomFields(data);
 
             validateInspectionDTO(dto, inspectionId);
+            // Fetch teams for this inspection
+            dto.setTeams(fetchInspectionTeams(inspectionId));
+            
             return dto;
 
         } catch (QamisApiException e) {
@@ -112,6 +116,28 @@ public class QamisIntegrationService {
         } catch (Exception e) {
             log.error("Error fetching inspection details from QAMIS for {}: {}", inspectionId, e.getMessage(), e);
             throw new QamisApiException("Failed to fetch inspection details: " + inspectionId, e);
+        }
+    }
+
+    public List<Map<String, Object>> fetchInspectionTeams(String inspectionId) {
+        try {
+            String url = qamisConfig.getApiUrl() + "/api/resource/Inspection%20Team?filters=[[\"inspection\",\"=\",\"" + inspectionId + "\"]]";
+            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new QamisApiException("QAMIS API returned error status when fetching teams: " + response.getStatusCode(), 
+                    response.getStatusCode().value());
+            }
+            
+            if (response.getBody() == null || !response.getBody().containsKey("data")) {
+                log.warn("No teams found for inspection {}", inspectionId);
+                return Collections.emptyList();
+            }
+
+            return (List<Map<String, Object>>) response.getBody().get("data");
+        } catch (Exception e) {
+            log.error("Error fetching teams for inspection {}: {}", inspectionId, e.getMessage());
+            throw new QamisApiException("Failed to fetch teams for inspection: " + inspectionId, e);
         }
     }
 

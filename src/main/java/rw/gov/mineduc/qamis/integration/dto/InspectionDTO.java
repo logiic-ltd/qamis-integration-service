@@ -21,6 +21,9 @@ public class InspectionDTO {
     @JsonProperty("custom_fields")
     private Map<String, Object> customFields;
     
+    @JsonProperty("teams")
+    private List<Map<String, Object>> teams;
+    
     // Getters and setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -36,6 +39,9 @@ public class InspectionDTO {
     
     public Map<String, Object> getCustomFields() { return customFields; }
     public void setCustomFields(Map<String, Object> customFields) { this.customFields = customFields; }
+    
+    public List<Map<String, Object>> getTeams() { return teams; }
+    public void setTeams(List<Map<String, Object>> teams) { this.teams = teams; }
     
     public Map<String, Object> getAdditionalProperties() { return additionalProperties; }
     public void setAdditionalProperties(Map<String, Object> additionalProperties) { 

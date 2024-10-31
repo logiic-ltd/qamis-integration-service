@@ -167,9 +167,9 @@ public class InspectionService {
         inspection.setMethodology(stripHtml((String) data.get("methodology")));
         inspection.setExecutiveSummary(stripHtml((String) data.get("executive_summary")));
         
-        // Handle teams
-        List<Map<String, Object>> teams = (List<Map<String, Object>>) data.get("inspection_teams");
-        if (teams != null) {
+        // Handle teams from separate API call
+        List<Map<String, Object>> teams = dto.getTeams();
+        if (teams != null && !teams.isEmpty()) {
             for (Map<String, Object> teamData : teams) {
                 InspectionTeam team = new InspectionTeam();
                 team.setName((String) teamData.get("name"));
