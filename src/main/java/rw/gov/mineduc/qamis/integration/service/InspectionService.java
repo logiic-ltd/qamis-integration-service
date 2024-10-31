@@ -120,30 +120,65 @@ public class InspectionService {
         }
     }
 
+    @Autowired
+    private QamisIntegrationService qamisIntegrationService;
+
     @Scheduled(cron = "${inspection.syncCron}")
     @Transactional
     public void scheduledSyncApprovedInspections() {
-        log.info("Starting scheduled sync of approved inspections");
+        log.info("Starting scheduled sync of approved inspections from QAMIS");
         try {
-            Page<Inspection> approvedInspections = inspectionRepository.findAll(
-                (root, query, cb) -> cb.equal(root.get("workflowState"), "APPROVED"),
-                Pageable.unpaged()
-            );
+            List<InspectionDTO> approvedInspections = qamisIntegrationService.fetchApprovedInspections();
             
-            log.debug("Found {} approved inspections to sync", approvedInspections.getContent().size());
+            log.debug("Found {} approved inspections to sync from QAMIS", approvedInspections.size());
             
-            for (Inspection inspection : approvedInspections.getContent()) {
+            for (InspectionDTO inspectionDTO : approvedInspections) {
                 try {
-                    syncInspection(inspection);
+                    InspectionDTO details = qamisIntegrationService.fetchInspectionDetails(inspectionDTO.getId());
+                    if (details != null) {
+                        Inspection inspection = convertDTOToInspection(details);
+                        syncInspection(inspection);
+                    }
                 } catch (Exception e) {
                     log.error("Failed to sync approved inspection {}: {}", 
-                             inspection.getName(), e.getMessage());
+                             inspectionDTO.getName(), e.getMessage());
                 }
             }
-            log.info("Completed scheduled sync of approved inspections");
+            log.info("Completed scheduled sync of approved inspections from QAMIS");
         } catch (Exception e) {
             log.error("Error during scheduled inspection sync: {}", e.getMessage());
             throw new InspectionSyncException("Scheduled inspection sync failed", e);
+        }
+    }
+
+    private Inspection convertDTOToInspection(InspectionDTO dto) {
+        Inspection inspection = new Inspection();
+        inspection.setName(dto.getName());
+        inspection.setInspectionName(dto.getInspectionName());
+        inspection.setWorkflowState(dto.getWorkflowState());
+        
+        // Set other fields from customFields map
+        Map<String, Object> customFields = dto.getCustomFields();
+        if (customFields != null) {
+            inspection.setStartDate(parseDate(customFields.get("start_date")));
+            inspection.setEndDate(parseDate(customFields.get("end_date")));
+            inspection.setIntroduction((String) customFields.get("introduction"));
+            inspection.setObjectives((String) customFields.get("objectives"));
+            inspection.setMethodology((String) customFields.get("methodology"));
+            inspection.setExecutiveSummary((String) customFields.get("executive_summary"));
+        }
+        
+        inspection.setLastModified(LocalDateTime.now());
+        return inspection;
+    }
+
+    private LocalDate parseDate(Object dateStr) {
+        if (dateStr == null) return null;
+        try {
+            return LocalDate.parse(dateStr.toString());
+        } catch (Exception e) {
+            log.warn("Failed to parse date: {}", dateStr);
+            return null;
         }
     }
 
