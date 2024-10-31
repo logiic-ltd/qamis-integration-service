@@ -107,8 +107,22 @@ public class InspectionService {
     }
 
     private boolean shouldSyncInspection(Inspection existing, Inspection incoming) {
-        return existing == null || 
-               incoming.getLastModified().isAfter(existing.getLastModified());
+        if (existing == null) {
+            log.debug("New inspection detected: {}", incoming.getName());
+            return true;
+        }
+        
+        if (incoming.getLastModified().isAfter(existing.getLastModified())) {
+            log.debug("Updated inspection detected: {} (Local: {}, Remote: {})", 
+                incoming.getName(),
+                existing.getLastModified(),
+                incoming.getLastModified());
+            return true;
+        }
+        
+        log.debug("No updates needed for inspection: {} (Last modified: {})",
+            existing.getName(), existing.getLastModified());
+        return false;
     }
 
     private void syncTeams(Inspection inspection) {
