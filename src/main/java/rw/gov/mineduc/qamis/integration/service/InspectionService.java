@@ -153,26 +153,57 @@ public class InspectionService {
 
     private Inspection convertDTOToInspection(InspectionDTO dto) {
         Inspection inspection = new Inspection();
-        inspection.setName(dto.getName());
-        inspection.setInspectionName(dto.getInspectionName());
-        inspection.setWorkflowState(dto.getWorkflowState());
+        Map<String, Object> data = dto.getCustomFields();
         
-        // Set other fields from customFields map
-        Map<String, Object> customFields = dto.getCustomFields();
-        if (customFields != null) {
-            inspection.setStartDate(parseDate(customFields.get("start_date")));
-            inspection.setEndDate(parseDate(customFields.get("end_date")));
-            inspection.setIntroduction((String) customFields.get("introduction"));
-            inspection.setObjectives((String) customFields.get("objectives"));
-            inspection.setMethodology((String) customFields.get("methodology"));
-            inspection.setExecutiveSummary((String) customFields.get("executive_summary"));
+        inspection.setName(dto.getName());
+        inspection.setInspectionName((String) data.get("inspection_name"));
+        inspection.setWorkflowState((String) data.get("workflow_state"));
+        inspection.setStartDate(parseDate((String) data.get("start_date")));
+        inspection.setEndDate(parseDate((String) data.get("end_date")));
+        
+        // Strip HTML tags from rich text fields
+        inspection.setIntroduction(stripHtml((String) data.get("introduction")));
+        inspection.setObjectives(stripHtml((String) data.get("objectives")));
+        inspection.setMethodology(stripHtml((String) data.get("methodology")));
+        inspection.setExecutiveSummary(stripHtml((String) data.get("executive_summary")));
+        
+        // Handle teams
+        List<Map<String, Object>> teams = (List<Map<String, Object>>) data.get("inspection_teams");
+        if (teams != null) {
+            for (Map<String, Object> teamData : teams) {
+                InspectionTeam team = new InspectionTeam();
+                team.setName((String) teamData.get("name"));
+                team.setTeamName((String) teamData.get("team_name"));
+                team.setInspection(inspection);
+                inspection.getTeams().add(team);
+            }
         }
         
-        inspection.setLastModified(LocalDateTime.now());
+        // Handle checklists
+        List<Map<String, Object>> checklists = (List<Map<String, Object>>) data.get("checklists");
+        if (checklists != null) {
+            for (Map<String, Object> checklistData : checklists) {
+                InspectionChecklist checklist = new InspectionChecklist();
+                checklist.setName((String) checklistData.get("name"));
+                checklist.setInspection(inspection);
+                inspection.getChecklists().add(checklist);
+            }
+        }
+        
+        inspection.setLastModified(LocalDateTime.parse(
+            (String) data.get("modified"), 
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")
+        ));
+        
         return inspection;
     }
 
-    private LocalDate parseDate(Object dateStr) {
+    private String stripHtml(String html) {
+        if (html == null) return null;
+        return html.replaceAll("<[^>]*>", "").trim();
+    }
+    
+    private LocalDate parseDate(String dateStr) {
         if (dateStr == null) return null;
         try {
             return LocalDate.parse(dateStr.toString());

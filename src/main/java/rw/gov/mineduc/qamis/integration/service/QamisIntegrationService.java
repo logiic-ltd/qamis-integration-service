@@ -36,7 +36,12 @@ public class QamisIntegrationService {
 
             List<Map<String, Object>> data = (List<Map<String, Object>>) response.getBody().get("data");
             return data.stream()
-                      .map(this::mapToInspectionDTO)
+                      .map(item -> {
+                          InspectionDTO dto = new InspectionDTO();
+                          dto.setId((String) item.get("name"));
+                          dto.setName((String) item.get("name"));
+                          return dto;
+                      })
                       .toList();
 
         } catch (Exception e) {
@@ -56,7 +61,13 @@ public class QamisIntegrationService {
             }
 
             Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
-            return mapToInspectionDTO(data);
+            InspectionDTO dto = new InspectionDTO();
+            dto.setId((String) data.get("name"));
+            dto.setName((String) data.get("name"));
+            dto.setInspectionName((String) data.get("inspection_name"));
+            dto.setWorkflowState((String) data.get("workflow_state"));
+            dto.setCustomFields(data);
+            return dto;
 
         } catch (Exception e) {
             log.error("Error fetching inspection details from QAMIS for {}: {}", inspectionId, e.getMessage());
