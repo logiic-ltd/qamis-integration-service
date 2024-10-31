@@ -154,7 +154,9 @@ public class QamisIntegrationService {
             String url = qamisConfig.getApiUrl() + "/api/resource/Inspection%20Team?filters=[[\"inspection\",\"=\",\"" + inspectionId + "\"]]";
             
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "token " + qamisConfig.getApiKey());
+            String auth = qamisConfig.getUsername() + ":" + qamisConfig.getPassword();
+            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes());
+            headers.set("Authorization", "Basic " + new String(encodedAuth));
             
             ResponseEntity<Map> response = restTemplate.exchange(
                 url,
