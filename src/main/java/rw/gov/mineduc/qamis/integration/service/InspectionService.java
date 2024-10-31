@@ -120,6 +120,33 @@ public class InspectionService {
         }
     }
 
+    @Scheduled(cron = "${inspection.syncCron}")
+    @Transactional
+    public void scheduledSyncApprovedInspections() {
+        log.info("Starting scheduled sync of approved inspections");
+        try {
+            Page<Inspection> approvedInspections = inspectionRepository.findAll(
+                (root, query, cb) -> cb.equal(root.get("workflowState"), "APPROVED"),
+                Pageable.unpaged()
+            );
+            
+            log.debug("Found {} approved inspections to sync", approvedInspections.getContent().size());
+            
+            for (Inspection inspection : approvedInspections.getContent()) {
+                try {
+                    syncInspection(inspection);
+                } catch (Exception e) {
+                    log.error("Failed to sync approved inspection {}: {}", 
+                             inspection.getName(), e.getMessage());
+                }
+            }
+            log.info("Completed scheduled sync of approved inspections");
+        } catch (Exception e) {
+            log.error("Error during scheduled inspection sync: {}", e.getMessage());
+            throw new InspectionSyncException("Scheduled inspection sync failed", e);
+        }
+    }
+
     private void validateInspection(Inspection inspection) {
         if (inspection.getName() == null || inspection.getName().trim().isEmpty()) {
             throw new IllegalArgumentException("Inspection name cannot be null or empty");
