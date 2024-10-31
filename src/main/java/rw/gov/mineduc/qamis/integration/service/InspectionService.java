@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import rw.gov.mineduc.qamis.integration.exception.InspectionSyncException;
 import rw.gov.mineduc.qamis.integration.model.Inspection;
 import rw.gov.mineduc.qamis.integration.model.InspectionChecklist;
+import rw.gov.mineduc.qamis.integration.model.InspectionChecklist;
 import rw.gov.mineduc.qamis.integration.model.InspectionTeam;
 import rw.gov.mineduc.qamis.integration.repository.InspectionChecklistRepository;
 import rw.gov.mineduc.qamis.integration.repository.InspectionRepository;
