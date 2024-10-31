@@ -24,11 +24,11 @@ public class QamisIntegrationService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Transactional(readOnly = true)
     public List<InspectionDTO> fetchApprovedInspections() {
         try {
-            String url = qamisConfig.getApiUrl() + "/api/resource/Inspection?filters=[[\"workflow_state\", \"=\", \"Approved by DG\"]]";
+            String url = qamisConfig.getApiUrl() + "/api/resource/Inspection?filters=[[\"workflow_state\",\"=\",\"Approved by DG\"]]&fields=[\"name\",\"inspection_name\",\"workflow_state\",\"modified\"]";
             ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
-            
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new QamisApiException("QAMIS API returned error status: " + response.getStatusCode(), 
                     response.getStatusCode().value());
@@ -68,7 +68,8 @@ public class QamisIntegrationService {
         }
     }
 
-    public InspectionDTO fetchInspectionDetails(String inspectionId) {
+    @Transactional(readOnly = true)
+    public InspectionDTO fetchInspectionDetails(String inspectionId) throws QamisApiException {
         if (inspectionId == null || inspectionId.trim().isEmpty()) {
             throw new IllegalArgumentException("Inspection ID cannot be null or empty");
         }

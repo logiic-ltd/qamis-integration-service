@@ -59,20 +59,35 @@ public class InspectionService {
     public void syncInspection(Inspection inspection) {
         log.info("Starting sync for inspection: {}", inspection.getName());
         try {
-            Inspection existingInspection = inspectionRepository.findById(inspection.getName())
-                    .orElse(null);
-
-            if (shouldSyncInspection(existingInspection, inspection)) {
-                log.debug("Syncing inspection data for: {}", inspection.getName());
-                inspection = inspectionRepository.save(inspection);
-
-                syncTeams(inspection);
-                syncChecklists(inspection);
-
-                log.info("Successfully synced inspection: {}", inspection.getName());
-            } else {
-                log.debug("Skipping sync for inspection {}, no updates needed", inspection.getName());
+            validateInspection(inspection);
+            
+            Optional<Inspection> existingInspectionOpt = inspectionRepository.findById(inspection.getName());
+            
+            if (existingInspectionOpt.isPresent()) {
+                Inspection existingInspection = existingInspectionOpt.get();
+                if (!shouldSyncInspection(existingInspection, inspection)) {
+                    log.debug("Skipping sync for inspection {}, no updates needed", inspection.getName());
+                    return;
+                }
+                // Clear existing relationships to prevent orphaned records
+                existingInspection.getTeams().clear();
+                existingInspection.getChecklists().clear();
+                inspectionRepository.save(existingInspection);
             }
+
+            log.debug("Syncing inspection data for: {}", inspection.getName());
+            
+            // First save the inspection to ensure it exists
+            inspection = inspectionRepository.save(inspection);
+            
+            // Then sync related entities
+            syncTeams(inspection);
+            syncChecklists(inspection);
+            
+            // Final save to update all relationships
+            inspectionRepository.save(inspection);
+            
+            log.info("Successfully synced inspection: {}", inspection.getName());
         } catch (Exception e) {
             log.error("Error during inspection sync {}: {}", inspection.getName(), e.getMessage());
             throw new InspectionSyncException("Failed to sync inspection: " + inspection.getName(), e);
@@ -90,8 +105,25 @@ public class InspectionService {
         
         for (InspectionTeam team : inspection.getTeams()) {
             try {
+                validateTeam(team);
                 team.setInspection(inspection);
+                
+                // Process team members
+                for (TeamMember member : team.getMembers()) {
+                    validateTeamMember(member);
+                    member.setTeam(team);
+                }
+                
+                // Process team schools
+                for (TeamSchool school : team.getSchools()) {
+                    validateTeamSchool(school);
+                    school.setTeam(team);
+                }
+                
                 inspectionTeamRepository.save(team);
+                log.debug("Successfully saved team {} with {} members and {} schools", 
+                         team.getName(), team.getMembers().size(), team.getSchools().size());
+                
             } catch (Exception e) {
                 log.error("Error saving team {} for inspection {}: {}", 
                          team.getName(), inspection.getName(), e.getMessage());
@@ -99,6 +131,33 @@ public class InspectionService {
                     "Failed to sync team: " + team.getName() + 
                     " for inspection: " + inspection.getName(), e);
             }
+        }
+    }
+
+    private void validateTeam(InspectionTeam team) {
+        if (team.getName() == null || team.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Team name cannot be null or empty");
+        }
+        if (team.getTeamName() == null || team.getTeamName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Team display name cannot be null or empty");
+        }
+    }
+
+    private void validateTeamMember(TeamMember member) {
+        if (member.getName() == null || member.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Team member name cannot be null or empty");
+        }
+        if (member.getRole() == null || member.getRole().trim().isEmpty()) {
+            throw new IllegalArgumentException("Team member role cannot be null or empty");
+        }
+    }
+
+    private void validateTeamSchool(TeamSchool school) {
+        if (school.getSchoolCode() == null || school.getSchoolCode().trim().isEmpty()) {
+            throw new IllegalArgumentException("School code cannot be null or empty");
+        }
+        if (school.getSchoolName() == null || school.getSchoolName().trim().isEmpty()) {
+            throw new IllegalArgumentException("School name cannot be null or empty");
         }
     }
 
