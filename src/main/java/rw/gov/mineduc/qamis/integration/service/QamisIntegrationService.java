@@ -15,6 +15,7 @@ import rw.gov.mineduc.qamis.integration.exception.InspectionSyncException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class QamisIntegrationService {
@@ -59,7 +60,7 @@ public class QamisIntegrationService {
                           dto.setName((String) item.get("name"));
                           return dto;
                       })
-                      .toList();
+                      .collect(Collectors.toList());
 
         } catch (QamisApiException e) {
             log.error("QAMIS API error: {} (Status: {})", e.getMessage(), e.getStatusCode());
