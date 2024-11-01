@@ -176,14 +176,14 @@ public class QamisIntegrationService {
 
             List<Map<String, Object>> teams = new ArrayList<>();
             for (Map<String, Object> teamLink : teamLinks) {
-                String linkName = (String) teamLink.get("name");
-                if (linkName != null) {
+                String teamName = (String) teamLink.get("team_name");
+                if (teamName != null) {
                     try {
-                        Map<String, Object> teamDetails = fetchTeamDetails(linkName);
+                        Map<String, Object> teamDetails = fetchTeamDetails(teamName);
                         if (teamDetails != null) {
-                            // Add the team name from the link to the team details
-                            teamDetails.put("team_name", teamLink.get("team_name"));
-                            teamDetails.put("members_count", teamLink.get("members_count"));
+                            // Add metadata from the team link
+                            teamDetails.put("link_name", teamLink.get("name"));
+                            teamDetails.put("members_count", teamLink.get("members_count")); 
                             teamDetails.put("schools_count", teamLink.get("schools_count"));
                             teams.add(teamDetails);
                         }
@@ -207,7 +207,7 @@ public class QamisIntegrationService {
         }
 
         try {
-            String url = qamisConfig.getApiUrl() + "/api/resource/Inspection Team Link/" + teamId;
+            String url = qamisConfig.getApiUrl() + "/api/resource/Inspection Team/" + teamId;
             
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "token " + qamisConfig.getApiToken());
