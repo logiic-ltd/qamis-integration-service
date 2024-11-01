@@ -26,7 +26,7 @@ public class TeamMember {
     private Integer idx;
     
     @Column(name = "dhis2_id")
-    private String id;
+    private String dhis2Id;
     
     private String username;
     
@@ -103,11 +103,11 @@ public class TeamMember {
     }
 
     public String getDhis2Id() {
-        return id;
+        return dhis2Id;
     }
 
-    public void setDhis2Id(String id) {
-        this.id = id;
+    public void setDhis2Id(String dhis2Id) {
+        this.dhis2Id = dhis2Id;
     }
 
     public String getUsername() {
