@@ -16,6 +16,7 @@ import rw.gov.mineduc.qamis.integration.config.QamisConfig;
 import rw.gov.mineduc.qamis.integration.dto.InspectionDTO;
 import rw.gov.mineduc.qamis.integration.exception.InspectionSyncException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
