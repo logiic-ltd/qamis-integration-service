@@ -147,7 +147,8 @@ public class QamisIntegrationService {
 
     public List<Map<String, Object>> fetchInspectionTeams(String inspectionId) {
         try {
-            String url = qamisConfig.getApiUrl() + "/api/resource/Inspection%20Team?filters=[[\"inspection\",\"=\",\"" + inspectionId + "\"]]";
+            String url = qamisConfig.getApiUrl() + "/api/resource/Inspection Team?filters=[[\"inspection\",\"=\",\"" + inspectionId + "\"]]";
+            url = url.replace(" ", "%20");
             
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "token " + qamisConfig.getApiToken());
@@ -173,6 +174,41 @@ public class QamisIntegrationService {
         } catch (Exception e) {
             log.error("Error fetching teams for inspection {}: {}", inspectionId, e.getMessage());
             throw new QamisApiException("Failed to fetch teams for inspection: " + inspectionId, e);
+        }
+    }
+
+    public Map<String, Object> fetchTeamDetails(String teamId) throws QamisApiException {
+        if (teamId == null || teamId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Team ID cannot be null or empty");
+        }
+
+        try {
+            String url = qamisConfig.getApiUrl() + "/api/resource/Inspection Team/" + teamId;
+            url = url.replace(" ", "%20");
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "token " + qamisConfig.getApiToken());
+            
+            ResponseEntity<Map> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                Map.class
+            );
+            
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new QamisApiException("QAMIS API returned error status when fetching team details: " + response.getStatusCode(), 
+                    response.getStatusCode().value());
+            }
+            
+            if (response.getBody() == null || !response.getBody().containsKey("data")) {
+                throw new QamisApiException("No team details found for ID " + teamId, 404);
+            }
+
+            return (Map<String, Object>) response.getBody().get("data");
+        } catch (Exception e) {
+            log.error("Error fetching team details for {}: {}", teamId, e.getMessage());
+            throw new QamisApiException("Failed to fetch team details: " + teamId, e);
         }
     }
 
