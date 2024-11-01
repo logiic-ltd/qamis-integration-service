@@ -188,8 +188,8 @@ public class QamisIntegrationService {
                             teams.add(teamDetails);
                         }
                     } catch (QamisApiException e) {
-                        log.error("Error fetching team details for link {} in inspection {}: {}", 
-                                linkName, inspectionId, e.getMessage());
+                        log.error("Error fetching team details for team {} in inspection {}: {}", 
+                                teamName, inspectionId, e.getMessage());
                     }
                 }
             }
