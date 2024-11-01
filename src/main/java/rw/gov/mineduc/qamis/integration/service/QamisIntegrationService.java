@@ -95,9 +95,7 @@ public class QamisIntegrationService {
             String url = qamisConfig.getApiUrl() + "/api/resource/Inspection/" + inspectionId;
             
             HttpHeaders headers = new HttpHeaders();
-            String auth = qamisConfig.getUsername() + ":" + qamisConfig.getPassword();
-            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes());
-            headers.set("Authorization", "Basic " + new String(encodedAuth));
+            headers.set("Authorization", "token " + qamisConfig.getApiToken());
             
             ResponseEntity<Map> response = restTemplate.exchange(
                 url,
@@ -152,9 +150,7 @@ public class QamisIntegrationService {
             String url = qamisConfig.getApiUrl() + "/api/resource/Inspection%20Team?filters=[[\"inspection\",\"=\",\"" + inspectionId + "\"]]";
             
             HttpHeaders headers = new HttpHeaders();
-            String auth = qamisConfig.getUsername() + ":" + qamisConfig.getPassword();
-            byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes());
-            headers.set("Authorization", "Basic " + new String(encodedAuth));
+            headers.set("Authorization", "token " + qamisConfig.getApiToken());
             
             ResponseEntity<Map> response = restTemplate.exchange(
                 url,

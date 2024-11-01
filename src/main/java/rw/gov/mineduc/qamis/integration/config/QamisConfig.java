@@ -7,8 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "qamis")
 public class QamisConfig {
     private String apiUrl;
-    private String username;
-    private String password;
+    private String apiToken;
 
     public String getApiUrl() {
         return apiUrl;
@@ -18,11 +17,11 @@ public class QamisConfig {
         this.apiUrl = apiUrl;
     }
 
-    public String getToken() {
-        return token;
+    public String getApiToken() {
+        return apiToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setApiToken(String apiToken) {
+        this.apiToken = apiToken;
     }
 }
