@@ -147,8 +147,8 @@ public class QamisIntegrationService {
 
     public List<Map<String, Object>> fetchInspectionTeams(String inspectionId) {
         try {
-            String url = qamisConfig.getApiUrl() + "/api/resource/Inspection Team?filters=[[\"inspection\",\"=\",\"" + inspectionId + "\"]]";
-            url = url.replace(" ", "%20");
+            // First fetch the inspection details to get team links
+            String url = qamisConfig.getApiUrl() + "/api/resource/Inspection/" + inspectionId;
             
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "token " + qamisConfig.getApiToken());
@@ -160,17 +160,36 @@ public class QamisIntegrationService {
                 Map.class
             );
             
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new QamisApiException("QAMIS API returned error status when fetching teams: " + response.getStatusCode(), 
-                    response.getStatusCode().value());
-            }
-            
-            if (response.getBody() == null || !response.getBody().containsKey("data")) {
-                log.warn("No teams found for inspection {}", inspectionId);
+            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null || !response.getBody().containsKey("data")) {
+                log.warn("No inspection data found for ID {}", inspectionId);
                 return Collections.emptyList();
             }
 
-            return (List<Map<String, Object>>) response.getBody().get("data");
+            Map<String, Object> inspectionData = (Map<String, Object>) response.getBody().get("data");
+            List<Map<String, Object>> teamLinks = (List<Map<String, Object>>) inspectionData.get("inspection_teams");
+            
+            if (teamLinks == null || teamLinks.isEmpty()) {
+                log.warn("No team links found for inspection {}", inspectionId);
+                return Collections.emptyList();
+            }
+
+            List<Map<String, Object>> teams = new ArrayList<>();
+            for (Map<String, Object> teamLink : teamLinks) {
+                String teamName = (String) teamLink.get("team_name");
+                if (teamName != null) {
+                    try {
+                        Map<String, Object> teamDetails = fetchTeamDetails(teamName);
+                        if (teamDetails != null) {
+                            teams.add(teamDetails);
+                        }
+                    } catch (QamisApiException e) {
+                        log.error("Error fetching team details for {} in inspection {}: {}", 
+                                teamName, inspectionId, e.getMessage());
+                    }
+                }
+            }
+            
+            return teams;
         } catch (Exception e) {
             log.error("Error fetching teams for inspection {}: {}", inspectionId, e.getMessage());
             throw new QamisApiException("Failed to fetch teams for inspection: " + inspectionId, e);
