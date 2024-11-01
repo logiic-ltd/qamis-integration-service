@@ -12,8 +12,26 @@ public class TeamMember {
     @Column(nullable = false)
     private String name;
     
-    @Column(nullable = false)
-    private String role;
+    private String owner;
+    
+    private String creation;
+    
+    private String modified;
+    
+    @Column(name = "modified_by")
+    private String modifiedBy;
+    
+    private Integer docstatus;
+    
+    private Integer idx;
+    
+    @Column(name = "dhis2_id")
+    private String id;
+    
+    private String username;
+    
+    @Column(name = "display_name")
+    private String displayName;
     
     @ManyToOne
     @JoinColumn(name = "team_id", nullable = false)
@@ -36,12 +54,76 @@ public class TeamMember {
         this.name = name;
     }
 
-    public String getRole() {
-        return role;
+    public String getOwner() {
+        return owner;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getCreation() {
+        return creation;
+    }
+
+    public void setCreation(String creation) {
+        this.creation = creation;
+    }
+
+    public String getModified() {
+        return modified;
+    }
+
+    public void setModified(String modified) {
+        this.modified = modified;
+    }
+
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
+
+    public Integer getDocstatus() {
+        return docstatus;
+    }
+
+    public void setDocstatus(Integer docstatus) {
+        this.docstatus = docstatus;
+    }
+
+    public Integer getIdx() {
+        return idx;
+    }
+
+    public void setIdx(Integer idx) {
+        this.idx = idx;
+    }
+
+    public String getDhis2Id() {
+        return id;
+    }
+
+    public void setDhis2Id(String id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public InspectionTeam getTeam() {
