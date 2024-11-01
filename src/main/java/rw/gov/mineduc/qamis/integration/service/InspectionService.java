@@ -303,6 +303,13 @@ public class InspectionService {
             for (Map<String, Object> checklistData : checklists) {
                 InspectionChecklist checklist = new InspectionChecklist();
                 checklist.setName((String) checklistData.get("name"));
+                checklist.setId((String) checklistData.get("id"));
+                checklist.setShortName((String) checklistData.get("short_name"));
+                checklist.setPeriodType((String) checklistData.get("period_type"));
+                checklist.setLastUpdated(LocalDateTime.parse(
+                    (String) checklistData.get("last_updated"),
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS")
+                ));
                 checklist.setInspection(inspection);
                 inspection.getChecklists().add(checklist);
             }
