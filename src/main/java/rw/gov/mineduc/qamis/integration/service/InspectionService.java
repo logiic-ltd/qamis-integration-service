@@ -181,9 +181,6 @@ public class InspectionService {
         if (member.getName() == null || member.getName().trim().isEmpty()) {
             throw new IllegalArgumentException("Team member name cannot be null or empty");
         }
-        if (member.getRole() == null || member.getRole().trim().isEmpty()) {
-            throw new IllegalArgumentException("Team member role cannot be null or empty");
-        }
     }
 
     private void validateTeamSchool(TeamSchool school) {
