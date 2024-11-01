@@ -272,7 +272,6 @@ public class InspectionService {
                     for (Map<String, Object> memberData : members) {
                         TeamMember member = new TeamMember();
                         member.setName((String) memberData.get("name"));
-                        member.setRole((String) memberData.get("role"));
                         member.setTeam(team);
                         team.getMembers().add(member);
                     }
