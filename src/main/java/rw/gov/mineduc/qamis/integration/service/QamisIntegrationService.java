@@ -203,8 +203,7 @@ public class QamisIntegrationService {
         }
 
         try {
-            String url = qamisConfig.getApiUrl() + "/api/resource/Inspection Team/" + teamId;
-            url = url.replace(" ", "%20");
+            String url = qamisConfig.getApiUrl() + "/api/resource/Inspection_Team/" + teamId.replace(" ", "_");
             
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "token " + qamisConfig.getApiToken());
