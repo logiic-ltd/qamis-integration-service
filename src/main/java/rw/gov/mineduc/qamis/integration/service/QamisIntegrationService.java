@@ -37,7 +37,7 @@ public class QamisIntegrationService {
             String url = qamisConfig.getApiUrl() + "/api/resource/Inspection?filters=[[\"workflow_state\",\"=\",\"Approved by DG\"]]&fields=[\"name\",\"inspection_name\",\"workflow_state\",\"modified\"]";
             
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "token " + qamisConfig.getToken());
+            headers.set("Authorization", "token " + qamisConfig.getApiToken());
             
             ResponseEntity<Map> response = restTemplate.exchange(
                 url,
