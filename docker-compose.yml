@@ -5,10 +5,8 @@ services:
     build: .
     ports:
       - "8081:8081"
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/qamis_db
-      - SPRING_DATASOURCE_USERNAME=dhis_tl
-      - SPRING_DATASOURCE_PASSWORD=P@ssw0rd
+    env_file:
+      - .env
     depends_on:
       - db
     networks:
