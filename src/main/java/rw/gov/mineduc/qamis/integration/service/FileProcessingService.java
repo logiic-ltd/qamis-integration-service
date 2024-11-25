@@ -38,7 +38,8 @@ public class FileProcessingService {
             for (int i = 1; i < rows.size(); i++) {
                 String[] row = rows.get(i);
                 Integer schoolCode = parseIntOrNull(row[0]);
-                
+
+
                 if (schoolCode == null) {
                     continue; // Skip rows with invalid school codes
                 }
@@ -59,6 +60,7 @@ public class FileProcessingService {
                     school.setLongitude(parseDoubleOrNull(row[10]));
                     school.setDay(parseStringOrNull(row[11]));
                     school.setBoarding(parseStringOrNull(row[12]));
+                    school.setSchoolEmail(parseStringOrNull(row[20]));
 
                     schools.add(school);
                 } catch (Exception e) {

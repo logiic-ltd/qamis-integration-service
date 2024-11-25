@@ -79,6 +79,7 @@ public class SchoolService {
         summary.put("sector", school.getSector());
         summary.put("cell", school.getCell());
         summary.put("village", school.getVillage());
+        summary.put("schoolEmail", school.getSchoolEmail());
         return summary;
     }
 }
