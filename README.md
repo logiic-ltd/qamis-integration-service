@@ -102,6 +102,16 @@ The CSV file for school data should have the following columns:
 
 This project uses Spring Boot 3.2.3 and is built with Maven. The main class is `QamisIntegrationServiceApplication`.
 
+### Code Formatting
+
+Before committing your changes, ensure that your code is formatted according to the Google Java Style Guide. Run the following command to format your code:
+
+```bash
+mvn fmt:format
+```
+
+This will apply the necessary formatting to all Java source files in the project.
+
 Key components:
 - `FileProcessingService`: Handles CSV file processing
 - `SchoolService`: Manages school data retrieval

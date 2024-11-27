@@ -9,6 +9,7 @@ import rw.gov.mineduc.qamis.integration.model.School;
 import rw.gov.mineduc.qamis.integration.repository.SchoolRepository;
 
 import java.io.*;
+import java.util.regex.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,8 @@ public class FileProcessingService {
             for (int i = 1; i < rows.size(); i++) {
                 String[] row = rows.get(i);
                 Integer schoolCode = parseIntOrNull(row[0]);
-                
+
+
                 if (schoolCode == null) {
                     continue; // Skip rows with invalid school codes
                 }
@@ -59,6 +61,12 @@ public class FileProcessingService {
                     school.setLongitude(parseDoubleOrNull(row[10]));
                     school.setDay(parseStringOrNull(row[11]));
                     school.setBoarding(parseStringOrNull(row[12]));
+                    String email = parseStringOrNull(row[20]);
+                    if (isValidEmail(email)) {
+                        school.setSchoolEmail(email);
+                    } else {
+                        System.err.println("Invalid email format for school code " + schoolCode + ": " + email);
+                    }
 
                     schools.add(school);
                 } catch (Exception e) {
@@ -89,5 +97,10 @@ public class FileProcessingService {
 
     private String parseStringOrNull(String value) {
         return (value != null && !value.isEmpty() && !value.equalsIgnoreCase("NULL")) ? value : "";
+    }
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        return email != null && pattern.matcher(email).matches();
     }
 }
