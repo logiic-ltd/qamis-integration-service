@@ -15,6 +15,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -68,7 +69,12 @@ public class FileProcessingService {
                     school.setLongitude(parseDoubleOrNull(row[10]));
                     school.setDay(parseStringOrNull(row[11]));
                     school.setBoarding(parseStringOrNull(row[12]));
-                    school.setSchoolEmail(parseStringOrNull(row[13]));
+                    String email = parseStringOrNull(row[20]);
+                    if (isValidEmail(email)) {
+                        school.setSchoolEmail(email);
+                    } else {
+                        System.err.println("Invalid email format for school code " + schoolCode + ": " + email);
+                    }
 
                     schools.add(school);
 
@@ -130,5 +136,10 @@ public class FileProcessingService {
         schoolIdentification.setSchoolEmail(school.getSchoolEmail());
 
         schoolIdentifications.add(schoolIdentification);
+    }
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        return email != null && pattern.matcher(email).matches();
     }
 }
