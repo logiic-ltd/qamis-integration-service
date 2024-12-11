@@ -17,7 +17,7 @@ public class DHIS2Dataset {
     @Column(nullable = false)
     private String shortName;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String periodType;
 
     @ElementCollection

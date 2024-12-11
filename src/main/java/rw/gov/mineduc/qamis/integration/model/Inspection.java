@@ -1,6 +1,12 @@
 package rw.gov.mineduc.qamis.integration.model;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -8,6 +14,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "inspections")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "name")
 public class Inspection {
     @Id
     private String name;
@@ -39,10 +46,15 @@ public class Inspection {
     @Column(nullable = false)
     private LocalDateTime lastModified;
     
-    @OneToMany(mappedBy = "inspection", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<InspectionTeam> teams = new HashSet<>();
+    @Column(nullable=false, columnDefinition = "boolean default false")
+    private boolean isSynced = false;
     
     @OneToMany(mappedBy = "inspection", cascade = CascadeType.ALL, orphanRemoval = true)
+   
+    private Set<InspectionTeam> teams = new HashSet<>();
+    
+    @OneToMany(mappedBy = "inspection", cascade = CascadeType.ALL, orphanRemoval = true,fetch=FetchType.EAGER)
+    
     private Set<InspectionChecklist> checklists = new HashSet<>();
 
     // Getters and setters
@@ -125,8 +137,18 @@ public class Inspection {
     public void setLastModified(LocalDateTime lastModified) {
         this.lastModified = lastModified;
     }
+    
+    
 
-    public Set<InspectionTeam> getTeams() {
+    public boolean isSynced() {
+		return isSynced;
+	}
+
+	public void setSynced(boolean isSynced) {
+		this.isSynced = isSynced;
+	}
+
+	public Set<InspectionTeam> getTeams() {
         return teams;
     }
 
@@ -141,4 +163,6 @@ public class Inspection {
     public void setChecklists(Set<InspectionChecklist> checklists) {
         this.checklists = checklists;
     }
+    
+    
 }
