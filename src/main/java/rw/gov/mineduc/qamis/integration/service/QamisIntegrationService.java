@@ -3,23 +3,23 @@ package rw.gov.mineduc.qamis.integration.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import java.util.Base64;
+import org.springframework.http.*;
+
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.web.client.RestTemplate;
+import rw.gov.mineduc.qamis.integration.dto.SchoolIdentificationDTO;
 import rw.gov.mineduc.qamis.integration.exception.QamisApiException;
 import rw.gov.mineduc.qamis.integration.config.QamisConfig;
 import rw.gov.mineduc.qamis.integration.dto.InspectionDTO;
-import rw.gov.mineduc.qamis.integration.exception.InspectionSyncException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +31,8 @@ public class QamisIntegrationService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    private static final DateTimeFormatter CUSTOM_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
 
     @Transactional(readOnly = true)
     public List<InspectionDTO> fetchApprovedInspections() {
@@ -256,4 +258,158 @@ public class QamisIntegrationService {
         dto.setCustomFields(data);
         return dto;
     }
+
+
+
+    /**
+     * Fetch data from Frappe API.
+     *
+     * @param lastSyncTimeStamp - Timestamp of the last successful synchronization.
+     * @return List of raw data maps fetched from the API.
+     */
+
+    public List<SchoolIdentificationDTO> fetchSchoolIdentification(LocalDateTime lastSyncTimeStamp){
+        try{
+            LocalDateTime defaultTimestamp = LocalDateTime.of(2024,11,1,0,0);
+            LocalDateTime timestamp = lastSyncTimeStamp != null ? lastSyncTimeStamp : defaultTimestamp;
+
+            String apiURL = qamisConfig.getApiUrl() + "/api/resource/School Identification?filters=[[\"modified\", \">\", \"" + timestamp + "\"]]&fields=[\"name\",\"modified\"]";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization","token"+ qamisConfig.getApiToken());
+
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    apiURL,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    Map.class
+            );
+            log.info("Fetching basic school identifications from Frappe API: {}", apiURL);
+            log.info("response from the api:{}",response);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null){
+                Map<String,Object> body = response.getBody();
+                if (body.containsKey("data")){
+                    List<Map<String,Object>> rawData = (List<Map<String, Object>>) body.get("data");
+                    return rawData.stream().map(this::mapToSchoolIdentificationDTO).collect(Collectors.toList());
+                }
+            }
+            log.warn("Unexpected or empty response from Frappe API.");
+            return Collections.emptyList();
+
+        }catch (Exception e){
+            log.error("Error fetching basic school identifications: {}", e.getMessage(), e);
+            throw new RuntimeException("failed to fetch school identification",e);
+        }
+    }
+
+    public SchoolIdentificationDTO fetchSchoolIdentificationDetails(String schoolName){
+
+        try{
+            String apiURL = qamisConfig.getApiUrl() + "/api/resource/School Identification/" + schoolName;
+            log.debug("school names:{}",schoolName);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization","token" + qamisConfig.getApiToken());
+
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    apiURL,
+                    HttpMethod.GET,
+                    new HttpEntity<>(headers),
+                    Map.class
+            );
+            log.info("Fetching detailed data for school: {}", schoolName);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null){
+                Map<String,Object> data = (Map<String, Object>) response.getBody().get("data");
+                if (data != null){
+                    SchoolIdentificationDTO dto = mapToSchoolIdentificationDTO(data);
+                    validateSchoolIdentificationDTO(dto,schoolName);
+                    return dto;
+                }
+            }
+            log.warn("No details found for school: {}", schoolName);
+            throw new RuntimeException("No details found for school:"+schoolName);
+        }catch (Exception e){
+            log.error("Error fetching detailed data for school {}: {}", schoolName, e.getMessage(), e);
+            throw new RuntimeException("failed to fetch school identification data for school name:"+schoolName,e);
+        }
+
+    }
+
+    private SchoolIdentificationDTO mapToSchoolIdentificationDTO(Map<String, Object> data) {
+        return SchoolIdentificationDTO.builder()
+                .schoolName((String) data.get("name"))
+                .schoolCode((Integer) data.get("school_code"))
+                .schoolStatus((String) data.get("status"))
+                .schoolOwner((String) data.get("school_owner"))
+                .schoolOwnerContact((String) data.get("contact"))
+                .accommodationStatus((String) data.get("accommodation_status"))
+                .yearOfEstablishment((Integer) data.get("year_of_establishment"))
+                .village((String) data.get("village"))
+                .cell((String) data.get("cell"))
+                .sector((String) data.get("sector"))
+                .district((String) data.get("district"))
+                .province((String) data.get("province"))
+                .headteacherName((String) data.get("ht_name"))
+                .headteacherQualification((String) data.get("qualification_of_headteacher"))
+                .headteacherTelephone((String) data.get("telephone"))
+                .numberOfBoys((Integer) data.get("number_of_boys"))
+                .numberOfGirls((Integer) data.get("number_of_girls"))
+                .totalStudents((Integer) data.get("total_nr_students"))
+                .studentsWithSen((Integer) data.get("students_with_sen"))
+                .numberOfMaleTeachers((Integer) data.get("number_of_male_teachers"))
+                .numberOfFemaleTeachers((Integer) data.get("number_of_female_teachers"))
+                .totalTeachers((Integer) data.get("number_of_teachers"))
+                .numberOfMaleAssistantTeachers((Integer) data.get("number_of_male_assistant_teachers"))
+                .numberOfFemaleAssistantTeachers((Integer) data.get("number_of_female_assistant_teachers"))
+                .totalAssistantTeachers((Integer) data.get("number_of_assistant_teachers"))
+                .totalAdministrativeStaff((Integer) data.get("total_number_of_administrative_staff"))
+                .headteacher((Integer) data.get("headteacher"))
+                .deputyHeadteacher((Integer) data.get("deputy_headteacher"))
+                .secretary((Integer) data.get("secretary"))
+                .librarian((Integer) data.get("librarian"))
+                .accountant((Integer) data.get("accountant"))
+                .otherAdministrativeStaff((Integer) data.get("other_staff"))
+                .totalSupportingStaff((Integer) data.get("total_number_of_supporting_staff"))
+                .cleaners((Integer) data.get("cleaners"))
+                .watchmen((Integer) data.get("watchmen"))
+                .schoolCooks((Integer) data.get("school_cooks"))
+                .storekeeper((Integer) data.get("storekeeper"))
+                .drivers((Integer) data.get("drivers"))
+                .otherSupportingStaff((Integer) data.get("other_supporting_staff"))
+                .numberOfClassrooms((Integer) data.get("nbr_of_classrooms"))
+                .numberOfLatrines((Integer) data.get("nbr_of_latrines"))
+                .numberOfKitchens((Integer) data.get("number_of_kitchen"))
+                .numberOfDiningHalls((Integer) data.get("number_of_dining_hall"))
+                .numberOfLibraries((Integer) data.get("number_of_library"))
+                .numberOfSmartClassrooms((Integer) data.get("number_of_smart_classrooms"))
+                .numberOfComputerLabs((Integer) data.get("number_of_computer_lab"))
+                .numberOfAdministrativeOffices((Integer) data.get("number_of_admin_offices"))
+                .numberOfMultipurposeHalls((Integer) data.get("number_of_multipurpose_halls"))
+                .numberOfAcademicStaffRooms((Integer) data.get("number_of_academic_staff_rooms"))
+                .lastModified(parseLocalDateTime((String) data.get("modified")))
+                .build();
+    }
+
+    private void validateSchoolIdentificationDTO(SchoolIdentificationDTO dto,String schoolName){
+        if (dto.getSchoolName() == null || dto.getSchoolName().isEmpty()){
+            throw new RuntimeException("invalid data: school name is missing for school:"+schoolName);
+        }
+    }
+
+    private LocalDateTime parseLocalDateTime(String dateTimeString) {
+        try {
+            return LocalDateTime.parse(dateTimeString, CUSTOM_DATE_FORMATTER);
+        } catch (Exception e) {
+            log.error("Error parsing date string: {}", dateTimeString, e);
+            throw new RuntimeException("Failed to parse date string: " + dateTimeString, e);
+        }
+    }
+
+
+
+
+
+
 }

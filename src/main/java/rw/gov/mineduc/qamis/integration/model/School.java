@@ -157,4 +157,12 @@ public class School {
     public void setBoarding(String boarding) {
         this.boarding = boarding;
     }
+
+    public String getSchoolEmail() {
+        return schoolEmail;
+    }
+
+    public void setSchoolEmail(String schoolEmail) {
+        this.schoolEmail = schoolEmail;
+    }
 }
