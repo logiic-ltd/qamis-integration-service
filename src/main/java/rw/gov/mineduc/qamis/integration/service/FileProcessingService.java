@@ -12,6 +12,7 @@ import rw.gov.mineduc.qamis.integration.repository.SchoolIdentificationRepositor
 import rw.gov.mineduc.qamis.integration.repository.SchoolRepository;
 
 import java.io.*;
+import java.util.regex.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +49,8 @@ public class FileProcessingService {
             for (int i = 1; i < rows.size(); i++) {
                 String[] row = rows.get(i);
                 Integer schoolCode = parseIntOrNull(row[0]);
-                
+
+
                 if (schoolCode == null) {
                     continue; // Skip rows with invalid school codes
                 }
@@ -114,7 +116,6 @@ public class FileProcessingService {
         return (value != null && !value.isEmpty() && !value.equalsIgnoreCase("NULL")) ? value : "";
     }
 
-
     private void synchronizeSchoolIdentification(School school, List<SchoolIdentification> schoolIdentifications){
         Integer schoolCode = school.getSchoolCode();
 
@@ -137,6 +138,7 @@ public class FileProcessingService {
 
         schoolIdentifications.add(schoolIdentification);
     }
+
     private boolean isValidEmail(String email) {
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
         Pattern pattern = Pattern.compile(emailRegex);

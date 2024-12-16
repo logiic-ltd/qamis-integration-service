@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - qamis-network
+
+  db:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=qamis_db
+      - POSTGRES_USER=dhis_tl
+      - POSTGRES_PASSWORD=P@ssw0rd
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - qamis-network
+
+networks:
+  qamis-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

@@ -2,10 +2,7 @@ package rw.gov.mineduc.qamis.integration.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import rw.gov.mineduc.qamis.integration.model.School;
 import rw.gov.mineduc.qamis.integration.service.FileProcessingService;
@@ -22,7 +19,7 @@ public class FileUploadController {
     private FileProcessingService fileProcessingService;
 
     @PostMapping("/schools")
-    public ResponseEntity<?> uploadSchoolFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadSchoolFile(@RequestPart("file") MultipartFile file) {
         try {
             List<School> processedSchools = fileProcessingService.processSchoolFile(file);
             return ResponseEntity.ok().body("Successfully processed and saved " + processedSchools.size() + " schools to the database.");
@@ -30,4 +27,5 @@ public class FileUploadController {
             return ResponseEntity.badRequest().body("Error processing file: " + e.getMessage());
         }
     }
+
 }

@@ -32,3 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 .aider*
+
+/src/main/resources/application-local.properties
+/src/main/resources/application-staging.properties
+/src/main/resources/application.properties
+
+# Ignore log files
+logs/*.log.*
