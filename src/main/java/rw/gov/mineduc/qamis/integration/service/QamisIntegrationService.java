@@ -291,7 +291,10 @@ public class QamisIntegrationService {
                 Map<String,Object> body = response.getBody();
                 if (body.containsKey("data")){
                     List<Map<String,Object>> rawData = (List<Map<String, Object>>) body.get("data");
+                    log.debug("Raw data received for mapping: {}", rawData);
+
                     return rawData.stream().map(this::mapToSchoolIdentificationDTO).collect(Collectors.toList());
+
                 }
             }
             log.warn("Unexpected or empty response from Frappe API.");
@@ -322,6 +325,7 @@ public class QamisIntegrationService {
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null){
                 Map<String,Object> data = (Map<String, Object>) response.getBody().get("data");
+
                 if (data != null){
                     SchoolIdentificationDTO dto = mapToSchoolIdentificationDTO(data);
                     validateSchoolIdentificationDTO(dto,schoolName);
@@ -340,7 +344,10 @@ public class QamisIntegrationService {
     private SchoolIdentificationDTO mapToSchoolIdentificationDTO(Map<String, Object> data) {
         return SchoolIdentificationDTO.builder()
                 .schoolName((String) data.get("name"))
-                .schoolCode((Integer) data.get("school_code"))
+                .schoolCode(Optional.ofNullable(data.get("school_code"))
+                        .map(s -> Integer.valueOf((String) s))
+                        .orElse(null))
+
                 .schoolStatus((String) data.get("status"))
                 .schoolOwner((String) data.get("school_owner"))
                 .schoolOwnerContact((String) data.get("contact"))
@@ -388,6 +395,7 @@ public class QamisIntegrationService {
                 .numberOfAdministrativeOffices((Integer) data.get("number_of_admin_offices"))
                 .numberOfMultipurposeHalls((Integer) data.get("number_of_multipurpose_halls"))
                 .numberOfAcademicStaffRooms((Integer) data.get("number_of_academic_staff_rooms"))
+                .schoolEmail((String) data.get("school_email"))
                 .lastModified(parseLocalDateTime((String) data.get("modified")))
                 .build();
     }
