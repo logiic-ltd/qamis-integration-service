@@ -45,6 +45,8 @@ public class SchoolControllerTest {
     schoolDTO.setProvince("Test Province");
     schoolDTO.setDistrict("Test District");
     schoolDTO.setSector("Test Sector");
+    schoolDTO.setCell("Test Cell");
+    schoolDTO.setVillage("Test Village");
 
     doNothing().when(schoolService).saveSchool(any());
 

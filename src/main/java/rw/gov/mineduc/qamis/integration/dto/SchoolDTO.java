@@ -16,7 +16,10 @@ public class SchoolDTO {
   @NotEmpty(message = "Sector is mandatory")
   private String sector;
 
+  @NotEmpty(message = "Cell is mandatory")
   private String cell;
+
+  @NotEmpty(message = "Village is mandatory")
   private String village;
   private String schoolStatus;
   private String schoolOwner;
