@@ -46,7 +46,7 @@ public class FileProcessingService {
                 }
 
                 try {
-                    School school = schoolRepository.findById(schoolCode).orElse(new School());
+                    School school = schoolRepository.findById(schoolCode.longValue()).orElse(new School());
 
                     school.setSchoolCode(schoolCode);
                     school.setSchoolName(parseStringOrNull(row[1]));
