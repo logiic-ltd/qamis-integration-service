@@ -66,7 +66,7 @@ class FileProcessingServiceTest {
         existingSchool.setSchoolCode(110101);
         existingSchool.setSchoolName("EXISTING SCHOOL");
 
-        when(schoolRepository.findById(110101)).thenReturn(Optional.of(existingSchool));
+        when(schoolRepository.findById(110101L)).thenReturn(Optional.of(existingSchool));
         when(schoolRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
 
         List<School> processedSchools = fileProcessingService.processSchoolFileForTesting(testFilePath);
@@ -84,7 +84,7 @@ class FileProcessingServiceTest {
         assertEquals("CYAPEPE PRIMARY SCHOOL", updatedSchool.getSchoolName());
         assertNotEquals("EXISTING SCHOOL", updatedSchool.getSchoolName());
 
-        verify(schoolRepository, times(1)).findById(110101);
+        verify(schoolRepository, times(1)).findById(110101L);
     }
 
     private void assertAllPropertiesNotNull(School school) {
