@@ -48,7 +48,7 @@ public class SchoolController {
     Page<Map<String, Object>> schoolSummaries = schools.map(schoolService::getSchoolSummary);
     return ResponseEntity.ok(schoolSummaries);
   }
-  @PostMapping("/")
+  @PostMapping("/create")
   public ResponseEntity<String> createSchool(@RequestBody @Valid SchoolDTO schoolDTO) {
     School school = new School();
     school.setSchoolName(schoolDTO.getSchoolName());
