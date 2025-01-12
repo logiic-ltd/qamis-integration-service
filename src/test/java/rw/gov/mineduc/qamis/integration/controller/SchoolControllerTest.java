@@ -12,19 +12,21 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import rw.gov.mineduc.qamis.integration.dto.SchoolDTO;
 import rw.gov.mineduc.qamis.integration.service.SchoolService;
 
-@WebMvcTest(SchoolController.class)
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 public class SchoolControllerTest {
 
-  @Autowired private MockMvc mockMvc;
+  private MockMvc mockMvc;
 
-  @MockBean private SchoolService schoolService;
+  @Mock private SchoolService schoolService;
 
   @InjectMocks private SchoolController schoolController;
 
@@ -33,6 +35,7 @@ public class SchoolControllerTest {
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
+    mockMvc = MockMvcBuilders.standaloneSetup(schoolController).build();
   }
 
   @Test
