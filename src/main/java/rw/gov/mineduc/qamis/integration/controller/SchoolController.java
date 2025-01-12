@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rw.gov.mineduc.qamis.integration.model.School;
+import rw.gov.mineduc.qamis.integration.dto.SchoolDTO;
 import rw.gov.mineduc.qamis.integration.service.SchoolService;
 import rw.gov.mineduc.qamis.integration.model.School;
 
@@ -49,13 +49,21 @@ public class SchoolController {
     return ResponseEntity.ok(schoolSummaries);
   }
   @PostMapping("/")
-  public ResponseEntity<String> createSchool(@RequestBody School school) {
-    if (school.getSchoolName() == null || school.getSchoolName().isEmpty() ||
-        school.getProvince() == null || school.getProvince().isEmpty() ||
-        school.getDistrict() == null || school.getDistrict().isEmpty() ||
-        school.getSector() == null || school.getSector().isEmpty()) {
-      return ResponseEntity.badRequest().body("School name and address fields are mandatory.");
-    }
+  public ResponseEntity<String> createSchool(@RequestBody @Valid SchoolDTO schoolDTO) {
+    School school = new School();
+    school.setSchoolName(schoolDTO.getSchoolName());
+    school.setProvince(schoolDTO.getProvince());
+    school.setDistrict(schoolDTO.getDistrict());
+    school.setSector(schoolDTO.getSector());
+    school.setCell(schoolDTO.getCell());
+    school.setVillage(schoolDTO.getVillage());
+    school.setSchoolStatus(schoolDTO.getSchoolStatus());
+    school.setSchoolOwner(schoolDTO.getSchoolOwner());
+    school.setLatitude(schoolDTO.getLatitude());
+    school.setLongitude(schoolDTO.getLongitude());
+    school.setDay(schoolDTO.getDay());
+    school.setBoarding(schoolDTO.getBoarding());
+    school.setSchoolEmail(schoolDTO.getSchoolEmail());
 
     schoolService.saveSchool(school);
     return ResponseEntity.ok("School created successfully.");
