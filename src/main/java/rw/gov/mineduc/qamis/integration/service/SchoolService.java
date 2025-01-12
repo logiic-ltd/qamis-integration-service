@@ -18,7 +18,7 @@ public class SchoolService {
 
   @Autowired private SchoolRepository schoolRepository;
 
-  public Map<String, Object> getSchoolDetails(Integer schoolCode, List<String> properties) {
+  public Map<String, Object> getSchoolDetails(Long schoolCode, List<String> properties) {
     Optional<School> schoolOptional = schoolRepository.findById(schoolCode);
     if (schoolOptional.isEmpty()) {
       return null;
