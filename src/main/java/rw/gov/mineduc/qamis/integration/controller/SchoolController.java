@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rw.gov.mineduc.qamis.integration.model.School;
 import rw.gov.mineduc.qamis.integration.service.SchoolService;
+import rw.gov.mineduc.qamis.integration.model.School;
 
 @RestController
 @RequestMapping("/api/schools")
@@ -46,5 +47,17 @@ public class SchoolController {
     Page<School> schools = schoolService.searchSchools(name, pageable);
     Page<Map<String, Object>> schoolSummaries = schools.map(schoolService::getSchoolSummary);
     return ResponseEntity.ok(schoolSummaries);
+  }
+  @PostMapping("/")
+  public ResponseEntity<String> createSchool(@RequestBody School school) {
+    if (school.getSchoolName() == null || school.getSchoolName().isEmpty() ||
+        school.getProvince() == null || school.getProvince().isEmpty() ||
+        school.getDistrict() == null || school.getDistrict().isEmpty() ||
+        school.getSector() == null || school.getSector().isEmpty()) {
+      return ResponseEntity.badRequest().body("School name and address fields are mandatory.");
+    }
+
+    schoolService.saveSchool(school);
+    return ResponseEntity.ok("School created successfully.");
   }
 }

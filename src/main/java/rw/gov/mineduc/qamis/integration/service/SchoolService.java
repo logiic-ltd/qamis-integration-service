@@ -78,4 +78,7 @@ public class SchoolService {
     summary.put("schoolEmail", school.getSchoolEmail());
     return summary;
   }
+  public void saveSchool(School school) {
+    schoolRepository.save(school);
+  }
 }
