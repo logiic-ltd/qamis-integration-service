@@ -61,12 +61,8 @@ public class FileProcessingService {
                     school.setLongitude(parseDoubleOrNull(row[10]));
                     school.setDay(parseStringOrNull(row[11]));
                     school.setBoarding(parseStringOrNull(row[12]));
-                    String email = parseStringOrNull(row[20]);
-                    if (isValidEmail(email)) {
-                        school.setSchoolEmail(email);
-                    } else {
-                        System.err.println("Invalid email format for school code " + schoolCode + ": " + email);
-                    }
+                    // Email field is not present in the CSV, setting to null
+                    school.setSchoolEmail(null);
 
                     schools.add(school);
                 } catch (Exception e) {
