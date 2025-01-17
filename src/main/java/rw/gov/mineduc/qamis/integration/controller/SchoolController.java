@@ -20,7 +20,8 @@ public class SchoolController {
 
   @GetMapping("/{schoolCode}")
   public ResponseEntity<Map<String, Object>> getSchoolDetails(
-      @PathVariable Integer schoolCode, @RequestParam(required = false) List<String> properties) {
+      @PathVariable("schoolCode") Integer schoolCode, 
+      @RequestParam(required = false) List<String> properties) {
 
     Map<String, Object> schoolDetails = schoolService.getSchoolDetails(schoolCode, properties);
 
